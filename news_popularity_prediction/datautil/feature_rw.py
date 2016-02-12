@@ -1,9 +1,12 @@
 __author__ = 'Georgios Rizos (georgerizos@iti.gr)'
 
+import os
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
+
+import numpy as np
 import pandas as pd
 from sklearn.externals import joblib
 
@@ -26,6 +29,46 @@ def h5load_from(store, name):
     data_frame = store[name]
     data_frame._metadata = store.get_storer(name).attrs.metadata
     return data_frame
+
+
+def store_features(timestamp_h5_store_file,
+                   handcrafted_features_h5_store_file,
+                   document,
+                   target_dict,
+                   comment_counter,
+                   timestamp_array,
+                   timestamp_column_names_list,
+                   handcrafted_feature_array,
+                   handcrafted_feature_names_list):
+    ####################################################################################################################
+    # Form a pandas data frame and store the data in h5 form along with *necessary* metadata.
+    ####################################################################################################################
+    # Form metadata dictionary.
+    discussion_metadata = target_dict
+
+    for v in target_dict.values():
+        if np.isnan(v):
+            return
+
+    # Check whether we have the appropriate number of rows for the dataframes.
+    if (comment_counter + 1) != (timestamp_array.shape[0]):
+        return
+
+    # Form data frames.
+    try:
+        timestamp_data_frame = pd.DataFrame(timestamp_array, columns=timestamp_column_names_list)
+        handcrafted_features_data_frame = pd.DataFrame(handcrafted_feature_array, columns=handcrafted_feature_names_list)
+    except ValueError:
+        raise RuntimeError
+    handcrafted_features_data_frame._metadata = discussion_metadata
+
+    # Store data frame along with metadata.
+    h5store_at(timestamp_h5_store_file,
+               "post_" + document["post_id"],
+               timestamp_data_frame)
+    h5store_at(handcrafted_features_h5_store_file,
+               "post_" + document["post_id"],
+               handcrafted_features_data_frame)
 
 
 def store_sklearn_model(file_path, model):
@@ -80,3 +123,20 @@ def get_kth_col(data_frame, k, feature_list):
     col = col.iloc[:, k]
 
     return col
+
+
+def make_folders(top_folder, dataset_name):
+    safe_make_folder(top_folder + "/results")
+    safe_make_folder(top_folder + "/results/" + dataset_name + "_focus")
+
+    safe_make_folder(top_folder + "/features")
+    safe_make_folder(top_folder + "/features/dataset_full")
+    safe_make_folder(top_folder + "/features/dataset_k")
+    safe_make_folder(top_folder + "/features/datasetwide")
+    safe_make_folder(top_folder + "/features/k_list")
+    safe_make_folder(top_folder + "/features/models")
+
+
+def safe_make_folder(folder):
+    if not os.path.exists(folder):
+        os.makedirs(folder)

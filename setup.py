@@ -19,12 +19,6 @@ setup(
               'news_popularity_prediction.features',
               'news_popularity_prediction.learning',
               'news_popularity_prediction.vizualization'],
-    # package_data={'news_popularity_prediction': ['news_post_data/reddit_news/*.h5',
-    #                                              'news_post_data/reddit_news/*.txt',
-    #                                              'news_post_data/slashdot/*.h5',
-    #                                              'news_post_data/slashdot/*.txt',
-    #                                              'news_post_data/barrapunto/*.h5',
-    #                                              'news_post_data/barrapunto/*.txt']},
     url='https://github.com/MKLab-ITI/news-popularity-prediction',
     license='Apache',
     description='A set of methods that predict the future values of popularity indices for news posts using a variety of features.',
@@ -45,8 +39,8 @@ setup(
         'Topic :: Scientific/Engineering :: Information Analysis'
     ],
     keywords="news-popularity-prediction online-discussion-analysis Reveal-FP7",
-    entry_points={
-        'console_scripts': ['run_all_experiments=news_popularity_prediction.entry_points.snow_2016_workshop.run_all_experiments:main'],
-    },
+    # entry_points={
+    #     'console_scripts': ['run_all_experiments=news_popularity_prediction.entry_points.snow_2016_workshop.run_all_experiments:main'],
+    # },
     install_requires=open("requirements.txt").read().split("\n")
 )

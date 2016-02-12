@@ -1,10 +1,18 @@
 __author__ = 'Georgios Rizos (georgerizos@iti.gr)'
 
+import os
+import inspect
 import multiprocessing
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
+
+import news_popularity_prediction
+
+
+def get_package_path():
+    return os.path.dirname(inspect.getfile(news_popularity_prediction))
 
 
 def get_file_row_generator(file_path, separator, encoding=None):

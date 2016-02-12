@@ -12,6 +12,54 @@ from news_popularity_prediction.features import basic_wrappers, branching_wrappe
     temporal_wrappers
 
 
+def get_handcrafted_feature_names(dataset):
+    """
+    Returns a set of feature names to be calculated.
+
+    Output: - names: A set of strings, corresponding to the features to be calculated.
+    """
+    names = set()
+
+    ####################################################################################################################
+    # Add basic discussion tree features.
+    ####################################################################################################################
+    names.update(["basic_comment_count",
+                  "basic_max_depth",
+                  "basic_ave_depth",
+                  "basic_max_width",
+                  "basic_ave_width",
+                  "basic_max_depth_max_width_ratio",
+                  "basic_depth_width_ratio_ave"])
+
+    ####################################################################################################################
+    # Add branching discussion tree features.
+    ####################################################################################################################
+    names.update(["branching_hirsch_index",
+                  "branching_wiener_index",
+                  "branching_randic_index"])
+
+    ####################################################################################################################
+    # Add user graph features.
+    ####################################################################################################################
+    names.update(["user_graph_user_count",
+                  "user_graph_hirsch_index",
+                  "user_graph_randic_index",
+                  "user_graph_outdegree_entropy",
+                  "user_graph_outdegree_normalized_entropy",
+                  "user_graph_indegree_entropy",
+                  "user_graph_indegree_normalized_entropy"])
+
+    ####################################################################################################################
+    # Add temporal features.
+    ####################################################################################################################
+    names.update(["temporal_first_half_mean_time",
+                  "temporal_last_half_mean_time",
+                  "temporal_std_time",
+                  "temporal_timestamp_range"])
+
+    return names
+
+
 def get_branching_feature_names(osn_name):
     names = set()
 
