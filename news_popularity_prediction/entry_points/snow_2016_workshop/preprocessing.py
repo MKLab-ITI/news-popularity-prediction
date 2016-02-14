@@ -8,6 +8,7 @@ sys.setrecursionlimit(10**6)
 from news_popularity_prediction.datautil.common import get_package_path
 from news_popularity_prediction.datautil.feature_rw import make_folders
 from news_popularity_prediction.discussion.builder import extract_features_static_dataset
+from news_popularity_prediction.learning.cascade_lifetime import calculate_comparison_lifetimes, store_feature_matrices
 
 
 ########################################################################################################################
@@ -66,8 +67,8 @@ else:
 ########################################################################################################################
 # Extract features for online discussions.
 ########################################################################################################################
-print("Extracting features for online discussions.")
-
+print("Extracting features for online discussions ...")
+"""
 # Extract features for RedditNews discussions.
 if reddit_flag:
     dataset_name = "reddit_news"
@@ -88,3 +89,42 @@ if barrapunto_flag:
     extract_features_static_dataset(dataset_name=dataset_name,
                                     input_data_folder=get_package_path() + "/news_post_data/" + dataset_name + "/anonymized_discussions",
                                     output_data_folder=OUTPUT_DATA_FOLDER + "/" + dataset_name + "/features")
+"""
+print("Features extracted.")
+########################################################################################################################
+# Calculate the comparison lifetimes and form/store the corresponding feature matrices.
+########################################################################################################################
+# Calculate the comparison lifetimes.
+"""
+print("Calculating the comparison lifetimes ...")
+if reddit_flag:
+    dataset_name = "reddit_news"
+    calculate_comparison_lifetimes(features_folder=OUTPUT_DATA_FOLDER + "/" + dataset_name + "/features",
+                                   osn_focus=None)
+
+if slashdot_flag:
+    dataset_name = "slashdot"
+    calculate_comparison_lifetimes(features_folder=OUTPUT_DATA_FOLDER + "/" + dataset_name + "/features",
+                                   osn_focus=None)
+
+if barrapunto_flag:
+    dataset_name = "barrapunto"
+    calculate_comparison_lifetimes(features_folder=OUTPUT_DATA_FOLDER + "/" + dataset_name + "/features",
+                                   osn_focus=None)
+"""
+print("Lifetimes calculated.")
+
+# Form and store the feature matrices for the lifetimes.
+print("Forming and storing the feature matrices for the lifetimes ...")
+if reddit_flag:
+    dataset_name = "reddit_news"
+    store_feature_matrices()
+
+if slashdot_flag:
+    dataset_name = "slashdot"
+    store_feature_matrices()
+
+if barrapunto_flag:
+    dataset_name = "barrapunto"
+    store_feature_matrices()
+print("Feature matrices stored.")

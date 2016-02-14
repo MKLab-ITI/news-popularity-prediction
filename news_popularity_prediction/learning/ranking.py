@@ -26,13 +26,7 @@ def initialize_k_evaluation_measures(number_of_k,
     kendall_tau_score_array = np.empty((number_of_k, number_of_folds), dtype=np.float64)
     p_value_array = np.empty((number_of_k, number_of_folds), dtype=np.float64)
 
-    weighted_kendall_tau_score_array = np.empty((number_of_k, number_of_folds), dtype=np.float64)
-    weighted_p_value_array = np.empty((number_of_k, number_of_folds), dtype=np.float64)
-
-    top_k_weighted_kendall_tau_score_array = np.empty((number_of_k, number_of_folds), dtype=np.float64)
-    top_k_weighted_p_value_array = np.empty((number_of_k, number_of_folds), dtype=np.float64)
-
-    least_squares_error = np.empty((number_of_k, number_of_folds), dtype=np.float64)
+    mean_square_error = np.empty((number_of_k, number_of_folds), dtype=np.float64)
 
     top_k_jaccard = np.empty((number_of_k, number_of_folds), dtype=np.float64)
 
@@ -40,26 +34,9 @@ def initialize_k_evaluation_measures(number_of_k,
 
     k_evaluation_measures = [kendall_tau_score_array,
                              p_value_array,
-                             weighted_kendall_tau_score_array,
-                             weighted_p_value_array,
-                             top_k_weighted_kendall_tau_score_array,
-                             top_k_weighted_p_value_array,
-                             least_squares_error,
+                             mean_square_error,
                              top_k_jaccard,
                              feature_importances_array]
-
-    # kendall_tau_score_mean_array = np.empty((number_of_k, number_of_folds), dtype=np.float64)
-    # kendall_tau_score_std_array = np.empty((number_of_k, number_of_folds), dtype=np.float64)
-    #
-    # p_value_mean_array = np.empty((number_of_k, number_of_folds), dtype=np.float64)
-    # p_value_std_array = np.empty((number_of_k, number_of_folds), dtype=np.float64)
-    #
-    # feature_importances_mean_array = np.empty([number_of_k, number_of_folds, number_of_features], dtype=np.float64)
-    # feature_importances_std_array = np.empty([number_of_k, number_of_folds, number_of_features], dtype=np.float64)
-    #
-    # k_evaluation_measures = [kendall_tau_score_mean_array, kendall_tau_score_std_array,
-    #                          p_value_mean_array, p_value_std_array,
-    #                          feature_importances_mean_array, feature_importances_std_array]
 
     return k_evaluation_measures
 
@@ -73,29 +50,14 @@ def update_k_evaluation_measures(k_evaluation_measures,
     k_evaluation_measures[2][k_index, :] = evaluation_measure_arrays[2]
     k_evaluation_measures[3][k_index, :] = evaluation_measure_arrays[3]
 
-    k_evaluation_measures[4][k_index, :] = evaluation_measure_arrays[4]
-    k_evaluation_measures[5][k_index, :] = evaluation_measure_arrays[5]
-
-    k_evaluation_measures[6][k_index, :] = evaluation_measure_arrays[6]
-    k_evaluation_measures[7][k_index, :] = evaluation_measure_arrays[7]
-
     try:
-        k_evaluation_measures[8][k_index, :, :] = np.squeeze(evaluation_measure_arrays[8])
+        k_evaluation_measures[4][k_index, :, :] = np.squeeze(evaluation_measure_arrays[4])
     except ValueError:
-        k_evaluation_measures[8][k_index, :, :] = evaluation_measure_arrays[8]
+        k_evaluation_measures[4][k_index, :, :] = evaluation_measure_arrays[4]
 
     print("Kendall's tau: ", np.mean(evaluation_measure_arrays[0]))
-    print("Mean LSE: ", np.mean(evaluation_measure_arrays[6]))
-    print("Top-100 Jaccard: ", np.mean(evaluation_measure_arrays[7]))
-
-    # k_evaluation_measures[0][k_index, :] = evaluation_measure_arrays[0]
-    # k_evaluation_measures[1][k_index, :] = evaluation_measure_arrays[1]
-    #
-    # k_evaluation_measures[2][k_index, :] = evaluation_measure_arrays[2]
-    # k_evaluation_measures[3][k_index, :] = evaluation_measure_arrays[3]
-    #
-    # k_evaluation_measures[4][k_index, :, :] = np.squeeze(evaluation_measure_arrays[4])
-    # k_evaluation_measures[5][k_index, :, :] = np.squeeze(evaluation_measure_arrays[5])
+    print("Mean MSE: ", np.mean(evaluation_measure_arrays[2]))
+    print("Top-100 Jaccard: ", np.mean(evaluation_measure_arrays[3]))
 
 
 def store_k_evaluation_measures(store_path,
@@ -113,20 +75,8 @@ def store_k_evaluation_measures(store_path,
         data_frame = pd.DataFrame(k_evaluation_measures[1][:, fold_index], columns=["p_value"], index=k_list)
         h5store_at(h5_store, "p_value/fold" + str(fold_index), data_frame)
 
-        data_frame = pd.DataFrame(k_evaluation_measures[2][:, fold_index], columns=["kendall_tau"], index=k_list)
-        h5store_at(h5_store, "weighted_kendall_tau/fold" + str(fold_index), data_frame)
-
-        data_frame = pd.DataFrame(k_evaluation_measures[3][:, fold_index], columns=["p_value"], index=k_list)
-        h5store_at(h5_store, "weighted_p_value/fold" + str(fold_index), data_frame)
-
-        data_frame = pd.DataFrame(k_evaluation_measures[4][:, fold_index], columns=["kendall_tau"], index=k_list)
-        h5store_at(h5_store, "top_k_weighted_kendall_tau/fold" + str(fold_index), data_frame)
-
-        data_frame = pd.DataFrame(k_evaluation_measures[5][:, fold_index], columns=["p_value"], index=k_list)
-        h5store_at(h5_store, "top_k_weighted_p_value/fold" + str(fold_index), data_frame)
-
-        data_frame = pd.DataFrame(k_evaluation_measures[6][:, fold_index], columns=["lse"], index=k_list)
-        h5store_at(h5_store, "lse/fold" + str(fold_index), data_frame)
+        data_frame = pd.DataFrame(k_evaluation_measures[6][:, fold_index], columns=["mse"], index=k_list)
+        h5store_at(h5_store, "mse/fold" + str(fold_index), data_frame)
 
         data_frame = pd.DataFrame(k_evaluation_measures[7][:, fold_index], columns=["jaccard"], index=k_list)
         h5store_at(h5_store, "top_k_jaccard/fold" + str(fold_index), data_frame)
@@ -144,11 +94,7 @@ def load_k_evaluation_measures(store_path,
 
     kendall_tau_keys = ["/data/" + "kendall_tau/fold" + str(fold_index) for fold_index in range(number_of_folds)]
     p_value_keys = ["/data/" + "p_value/fold" + str(fold_index) for fold_index in range(number_of_folds)]
-    weighted_kendall_tau_keys = ["/data/" + "weighted_kendall_tau/fold" + str(fold_index) for fold_index in range(number_of_folds)]
-    weighted_p_value_keys = ["/data/" + "weighted_p_value/fold" + str(fold_index) for fold_index in range(number_of_folds)]
-    top_k_weighted_kendall_tau_keys = ["/data/" + "top_k_weighted_kendall_tau/fold" + str(fold_index) for fold_index in range(number_of_folds)]
-    top_k_weighted_p_value_keys = ["/data/" + "top_k_weighted_p_value/fold" + str(fold_index) for fold_index in range(number_of_folds)]
-    lse_keys = ["/data/" + "lse/fold" + str(fold_index) for fold_index in range(number_of_folds)]
+    mse_keys = ["/data/" + "mse/fold" + str(fold_index) for fold_index in range(number_of_folds)]
     jaccard_keys = ["/data/" + "top_k_jaccard/fold" + str(fold_index) for fold_index in range(number_of_folds)]
     feature_importances_keys = ["/data/" + "feature_importances/fold" + str(fold_index) for fold_index in range(number_of_folds)]
 
@@ -170,18 +116,9 @@ def load_k_evaluation_measures(store_path,
     p_value_array = np.empty((number_of_samples,
                               number_of_folds),
                              dtype=np.float64)
-    weighted_kendall_tau_score_array = np.empty((number_of_samples,
-                                                 number_of_folds), dtype=np.float64)
-    weighted_p_value_array = np.empty((number_of_samples,
-                                       number_of_folds), dtype=np.float64)
 
-    top_k_weighted_kendall_tau_score_array = np.empty((number_of_samples,
-                                                       number_of_folds), dtype=np.float64)
-    top_k_weighted_p_value_array = np.empty((number_of_samples,
-                                             number_of_folds), dtype=np.float64)
-
-    least_squares_error = np.empty((number_of_samples,
-                                    number_of_folds), dtype=np.float64)
+    mean_square_error = np.empty((number_of_samples,
+                                  number_of_folds), dtype=np.float64)
 
     top_k_jaccard = np.empty((number_of_samples,
                               number_of_folds), dtype=np.float64)
@@ -194,31 +131,19 @@ def load_k_evaluation_measures(store_path,
     for f in range(number_of_folds):
         kendall_tau_key = kendall_tau_keys[f]
         p_value_key = p_value_keys[f]
-        weighted_kendall_tau_key = weighted_kendall_tau_keys[f]
-        weighted_p_value_key = weighted_p_value_keys[f]
-        top_k_weighted_kendall_tau_key = top_k_weighted_kendall_tau_keys[f]
-        top_k_weighted_p_value_key = top_k_weighted_p_value_keys[f]
-        lse_key = lse_keys[f]
+        mse_key = mse_keys[f]
         jaccard_key = jaccard_keys[f]
         feature_importances_key = feature_importances_keys[f]
 
         kendall_tau_data_frame = h5load_from(h5_store, kendall_tau_key)
         p_value_data_frame = h5load_from(h5_store, p_value_key)
-        weighted_kendall_tau_data_frame = h5load_from(h5_store, weighted_kendall_tau_key)
-        weighted_p_value_data_frame = h5load_from(h5_store, weighted_p_value_key)
-        top_k_weighted_kendall_tau_data_frame = h5load_from(h5_store, top_k_weighted_kendall_tau_key)
-        top_k_weighted_p_value_data_frame = h5load_from(h5_store, top_k_weighted_p_value_key)
-        lse_data_frame = h5load_from(h5_store, lse_key)
+        mse_data_frame = h5load_from(h5_store, mse_key)
         jaccard_data_frame = h5load_from(h5_store, jaccard_key)
         feature_importances_data_frame = h5load_from(h5_store, feature_importances_key)
 
         kendall_tau_array[:, f] = np.squeeze(kendall_tau_data_frame.values)
         p_value_array[:, f] = np.squeeze(p_value_data_frame.values)
-        weighted_kendall_tau_score_array[:, f] = np.squeeze(weighted_kendall_tau_data_frame.values)
-        weighted_p_value_array[:, f] = np.squeeze(weighted_p_value_data_frame.values)
-        top_k_weighted_kendall_tau_score_array[:, f] = np.squeeze(top_k_weighted_kendall_tau_data_frame.values)
-        top_k_weighted_p_value_array[:, f] = np.squeeze(top_k_weighted_p_value_data_frame.values)
-        least_squares_error[:, f] = np.squeeze(lse_data_frame.values)
+        mean_square_error[:, f] = np.squeeze(mse_data_frame.values)
         top_k_jaccard[:, f] = np.squeeze(jaccard_data_frame.values)
         try:
             feature_importances_array[:, f, :] = np.squeeze(feature_importances_data_frame.values)
@@ -227,11 +152,7 @@ def load_k_evaluation_measures(store_path,
 
     k_evaluation_measures = (kendall_tau_array,
                              p_value_array,
-                             weighted_kendall_tau_score_array,
-                             weighted_p_value_array,
-                             top_k_weighted_kendall_tau_score_array,
-                             top_k_weighted_p_value_array,
-                             least_squares_error,
+                             mean_square_error,
                              top_k_jaccard,
                              feature_importances_array)
 
@@ -249,17 +170,7 @@ def initialize_evaluation_measure_arrays(number_of_folds,
     p_value_array = np.empty(number_of_folds,
                              dtype=np.float64)
 
-    weighted_kendall_tau_score_array = np.empty(number_of_folds,
-                                                dtype=np.float64)
-    weighted_p_value_array = np.empty(number_of_folds,
-                                      dtype=np.float64)
-
-    top_k_weighted_kendall_tau_score_array = np.empty(number_of_folds,
-                                                      dtype=np.float64)
-    top_k_weighted_p_value_array = np.empty(number_of_folds,
-                                            dtype=np.float64)
-
-    lse_array = np.empty(number_of_folds,
+    mse_array = np.empty(number_of_folds,
                          dtype=np.float64)
     jaccard_array = np.empty(number_of_folds,
                              dtype=np.float64)
@@ -269,11 +180,7 @@ def initialize_evaluation_measure_arrays(number_of_folds,
                                          dtype=np.float64)
     measure_arrays_list = [kendall_tau_score_array,
                            p_value_array,
-                           weighted_kendall_tau_score_array,
-                           weighted_p_value_array,
-                           top_k_weighted_kendall_tau_score_array,
-                           top_k_weighted_p_value_array,
-                           lse_array,
+                           mse_array,
                            jaccard_array,
                            feature_importances_array]
     return measure_arrays_list
@@ -327,16 +234,14 @@ def learning_module(file_path,
     # weighted_kendall_tau_score, weighted_p_value = kendalltau(y_test, y_pred)
     # top_k_weighted_kendall_tau_score, top_k_weighted_p_value = kendalltau(y_test, y_pred)
 
-    lse = np.mean(np.power(y_test - y_pred, 2))
+    mse = np.mean(np.power(y_test - y_pred, 2))
     top_k_jaccard = top_k_jaccard_score(y_test, y_pred, top_k=100)
 
     # elapsed_time = time.perf_counter() - start_time
     # print("Kendall Tau time: ", elapsed_time)
 
     ranking_evaluation_tuple = [kendall_tau_score, p_value,
-                                kendall_tau_score, p_value,
-                                kendall_tau_score, p_value,
-                                lse, top_k_jaccard,
+                                mse, top_k_jaccard,
                                 feature_importances]
 
     return ranking_evaluation_tuple
@@ -408,31 +313,27 @@ def update_evaluation_measure_arrays(evaluation_measure_arrays,
     evaluation_measure_arrays[1][fold_index] = evaluation_tuple[1]  # p-value
     evaluation_measure_arrays[2][fold_index] = evaluation_tuple[2]
     evaluation_measure_arrays[3][fold_index] = evaluation_tuple[3]
-    evaluation_measure_arrays[4][fold_index] = evaluation_tuple[4]
-    evaluation_measure_arrays[5][fold_index] = evaluation_tuple[5]
-    evaluation_measure_arrays[6][fold_index] = evaluation_tuple[6]
-    evaluation_measure_arrays[7][fold_index] = evaluation_tuple[7]
 
-    evaluation_measure_arrays[8][fold_index, :] = evaluation_tuple[8]  # Feature weights
+    evaluation_measure_arrays[4][fold_index, :] = evaluation_tuple[4]  # Feature weights
 
 
-def average_evaluation_measure_arrays_across_trials(evaluation_measure_arrays):
-    kendall_tau_score_mean = evaluation_measure_arrays[0].mean()
-    kendall_tau_score_std = evaluation_measure_arrays[0].std()
-
-    p_value_mean = evaluation_measure_arrays[1].mean()
-    p_value_std = evaluation_measure_arrays[1].std()
-
-    feature_importances_mean = evaluation_measure_arrays[2].mean(axis=0)
-    feature_importances_std = evaluation_measure_arrays[2].std(axis=0)
-
-    evaluation_measures = [kendall_tau_score_mean, kendall_tau_score_std,
-                           p_value_mean, p_value_std,
-                           feature_importances_mean, feature_importances_std]
-
-    print("Average Kendall's tau score: ", kendall_tau_score_mean)
-
-    return evaluation_measures
+# def average_evaluation_measure_arrays_across_trials(evaluation_measure_arrays):
+#     kendall_tau_score_mean = evaluation_measure_arrays[0].mean()
+#     kendall_tau_score_std = evaluation_measure_arrays[0].std()
+#
+#     p_value_mean = evaluation_measure_arrays[1].mean()
+#     p_value_std = evaluation_measure_arrays[1].std()
+#
+#     feature_importances_mean = evaluation_measure_arrays[4].mean(axis=0)
+#     feature_importances_std = evaluation_measure_arrays[4].std(axis=0)
+#
+#     evaluation_measures = [kendall_tau_score_mean, kendall_tau_score_std,
+#                            p_value_mean, p_value_std,
+#                            feature_importances_mean, feature_importances_std]
+#
+#     print("Average Kendall's tau score: ", kendall_tau_score_mean)
+#
+#     return evaluation_measures
 
 
 def is_k_valid(i,

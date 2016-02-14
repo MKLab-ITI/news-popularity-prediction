@@ -67,7 +67,7 @@ def extract_features_static_dataset(dataset_name,
     for document in document_generator(source_file_path_list):
         document_counter += 1
         actual_document_counter += 1
-        if actual_document_counter % 50 == 0:
+        if actual_document_counter % 500 == 0:
             print("Document no: ", actual_document_counter)
 
         comment_gen = comment_generator(document=document)

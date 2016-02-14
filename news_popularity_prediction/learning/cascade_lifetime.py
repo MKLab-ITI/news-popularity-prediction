@@ -1,10 +1,50 @@
 __author__ = 'Georgios Rizos (georgerizos@iti.gr)'
 
+import os
 import statistics
 
 import numpy as np
 
-from news_popularity_prediction.datautil.feature_rw import h5load_from, get_kth_row
+from news_popularity_prediction.datautil.feature_rw import h5load_from, get_kth_row, h5_open
+
+
+def calculate_comparison_lifetimes(features_folder,
+                                   osn_focus):
+    if osn_focus is None:
+        osn_focus = "post"
+
+    # This is a list of all the .h5 files as produced after preprocessing.
+    h5_store_file_name_list = os.listdir(features_folder)
+    h5_store_file_name_list = [h5_store_file_name for h5_store_file_name in sorted(h5_store_file_name_list) if not h5_store_file_name[-1] == "~"]
+
+    timestamp_h5_store_file_name_list = [name for name in h5_store_file_name_list if "timestamp" in name]
+    handcrafted_features_h5_store_file_name_list = [name for name in h5_store_file_name_list if "handcrafted" in name]
+
+    timestamp_h5_store_file_path_list = [features_folder + "/" + h5_store_file_name for h5_store_file_name in timestamp_h5_store_file_name_list]
+    handcrafted_features_h5_store_file_path_list = [features_folder + "/" + h5_store_file_name for h5_store_file_name in handcrafted_features_h5_store_file_name_list]
+
+    file_path_list_zip = zip(timestamp_h5_store_file_path_list,
+                             handcrafted_features_h5_store_file_path_list)
+
+    h5_stores_and_keys = list()
+    for file_paths in file_path_list_zip:
+        timestamp_h5_store_file = h5_open(file_paths[0])
+        handcrafted_features_h5_store_file = h5_open(file_paths[1])
+
+        keys_dict = dict()
+        keys_dict[osn_focus] = sorted((key for key in timestamp_h5_store_file.keys() if osn_focus in key))
+
+        h5_stores_and_keys.append(((timestamp_h5_store_file,
+                                    handcrafted_features_h5_store_file),
+                                   keys_dict))
+
+    t_list = get_valid_k_list(h5_stores_and_keys,
+                              osn_focus)
+
+    k_list_path = features_folder + "/k_list/focus_" + osn_focus + ".txt"
+
+    store_valid_k_list(k_list_path,
+                       t_list)
 
 
 def get_valid_k_list(h5_stores_and_keys,
@@ -21,6 +61,25 @@ def get_valid_k_list(h5_stores_and_keys,
     t_list = list(t_list)
 
     return t_list
+
+
+def store_valid_k_list(k_list_path, k_list):
+    with open(k_list_path, "w") as fp:
+        for k in k_list:
+            row = repr(k) + "\n"
+            fp.write(row)
+
+
+def load_valid_k_list(k_list_path):
+    k_list = list()
+
+    with open(k_list_path, "r") as fp:
+        for row in fp:
+            row_stripped = row.strip()
+            if row_stripped == "":
+                continue
+            k_list.append(row_stripped)
+    return k_list
 
 
 def get_dataset_size(h5_store_and_keys,
@@ -76,7 +135,7 @@ def get_dataframe_row(data_frame, k, k_based_on_lifetime_old, feature_list):
     return kth_row, k_based_on_lifetime
 
 
-def get_k_based_on_timestamp(data_frame, timestamp, min_k=0, max_k=-1):  # TODO: Need to check if k is the same as the minimum.
+def get_k_based_on_timestamp(data_frame, timestamp, min_k=0, max_k=-1):
 
     timestamp_col = data_frame["timestamp"]
     timestamp_col = timestamp_col.iloc[:, min_k, max_k + 1]

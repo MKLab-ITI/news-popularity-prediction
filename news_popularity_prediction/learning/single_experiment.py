@@ -107,7 +107,6 @@ class DiscussionModellingExperiment:
         self.folding = ranking.folding
         self.learning_module = ranking.learning_module
         self.update_evaluation_measure_arrays = ranking.update_evaluation_measure_arrays
-        self.average_evaluation_measure_arrays_across_trials = ranking.average_evaluation_measure_arrays_across_trials
         self.is_k_valid = ranking.is_k_valid
 
         # Define feature matrix columns.
@@ -166,34 +165,24 @@ class DiscussionModellingExperiment:
 
         timestamp_h5_store_file_name_list = [name for name in h5_store_file_name_list if "timestamp" in name]
         handcrafted_features_h5_store_file_name_list = [name for name in h5_store_file_name_list if "handcrafted" in name]
-        author_features_h5_store_file_name_list = [name for name in h5_store_file_name_list if "author" in name]
-        bipartite_features_h5_store_file_name_list = [name for name in h5_store_file_name_list if "bipartite" in name]
 
         timestamp_h5_store_file_path_list = [uniform_folder + "/" + h5_store_file_name for h5_store_file_name in timestamp_h5_store_file_name_list]
         handcrafted_features_h5_store_file_path_list = [uniform_folder + "/" + h5_store_file_name for h5_store_file_name in handcrafted_features_h5_store_file_name_list]
-        author_features_h5_store_file_path_list = [uniform_folder + "/" + h5_store_file_name for h5_store_file_name in author_features_h5_store_file_name_list]
-        bipartite_features_h5_store_file_path_list = [uniform_folder + "/" + h5_store_file_name for h5_store_file_name in bipartite_features_h5_store_file_name_list]
 
         file_path_list_zip = zip(timestamp_h5_store_file_path_list,
-                                 handcrafted_features_h5_store_file_path_list,
-                                 author_features_h5_store_file_path_list,
-                                 bipartite_features_h5_store_file_path_list)
+                                 handcrafted_features_h5_store_file_path_list)
 
         h5_stores_and_keys = list()
         for file_paths in file_path_list_zip:
             timestamp_h5_store_file = h5_open(file_paths[0])
             handcrafted_features_h5_store_file = h5_open(file_paths[1])
-            author_features_h5_store_file = h5_open(file_paths[2])
-            bipartite_features_h5_store_file = h5_open(file_paths[3])
 
             keys_dict = dict()
             for osn_name in keep_dataset:
                 keys_dict[osn_name] = sorted((key for key in timestamp_h5_store_file.keys() if osn_name in key))
 
             h5_stores_and_keys.append(((timestamp_h5_store_file,
-                                        handcrafted_features_h5_store_file,
-                                        author_features_h5_store_file,
-                                        bipartite_features_h5_store_file),
+                                        handcrafted_features_h5_store_file),
                                        keys_dict))
 
         return h5_stores_and_keys
@@ -211,35 +200,17 @@ class DiscussionModellingExperiment:
         k_list_path = self.uniform_folder + "/k_list/focus_" + self.osn_name_focus + ".txt"
 
         if os.path.exists(k_list_path):
-            k_list = self.load_valid_k_list(k_list_path)
+            k_list = cascade_lifetime.load_valid_k_list(k_list_path)
         else:
             self.h5_stores_and_keys = self.get_h5_stores_and_keys(keep_dataset=self.feature_osn_name_list)
 
             k_list = self.get_valid_k_list(h5_stores_and_keys=self.h5_stores_and_keys,
                                            osn_focus=self.osn_name_focus)
 
-            self.store_valid_k_list(k_list_path,
-                                    k_list)
+            cascade_lifetime.store_valid_k_list(k_list_path,
+                                                k_list)
 
         return self.h5_stores_and_keys, k_list
-
-    def store_valid_k_list(self, k_list_path, k_list):
-        with open(k_list_path, "w") as fp:
-            for k in k_list:
-                row = repr(k) + "\n"
-                fp.write(row)
-
-    def load_valid_k_list(self, k_list_path):
-        k_list = list()
-
-        with open(k_list_path, "r") as fp:
-            for row in fp:
-                row_stripped = row.strip()
-                if row_stripped == "":
-                    continue
-                k_list.append(row_stripped)
-        # return k_list[:1]
-        return k_list
 
     def k_sweep(self,
                 h5_stores_and_keys,
