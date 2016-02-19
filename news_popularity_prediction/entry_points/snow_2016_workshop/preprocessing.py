@@ -8,7 +8,7 @@ sys.setrecursionlimit(10**6)
 from news_popularity_prediction.datautil.common import get_package_path
 from news_popularity_prediction.datautil.feature_rw import make_folders
 from news_popularity_prediction.discussion.builder import extract_features_static_dataset
-from news_popularity_prediction.learning.cascade_lifetime import calculate_comparison_lifetimes, store_feature_matrices
+from news_popularity_prediction.learning.cascade_lifetime import calculate_comparison_lifetimes, make_feature_matrices
 
 
 ########################################################################################################################
@@ -116,15 +116,20 @@ print("Lifetimes calculated.")
 
 # Form and store the feature matrices for the lifetimes.
 print("Forming and storing the feature matrices for the lifetimes ...")
+
 if reddit_flag:
     dataset_name = "reddit_news"
-    store_feature_matrices()
+    make_feature_matrices(features_folder=OUTPUT_DATA_FOLDER + "/" + dataset_name + "/features",
+                          osn_focus="reddit")
 
 if slashdot_flag:
     dataset_name = "slashdot"
-    store_feature_matrices()
+    make_feature_matrices(features_folder=OUTPUT_DATA_FOLDER + "/" + dataset_name + "/features",
+                          osn_focus="slashdot")
 
 if barrapunto_flag:
     dataset_name = "barrapunto"
-    store_feature_matrices()
+    make_feature_matrices(features_folder=OUTPUT_DATA_FOLDER + "/" + dataset_name + "/features",
+                          osn_focus="barrapunto")
+
 print("Feature matrices stored.")

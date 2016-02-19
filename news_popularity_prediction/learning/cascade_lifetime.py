@@ -4,8 +4,222 @@ import os
 import statistics
 
 import numpy as np
+import pandas as pd
 
-from news_popularity_prediction.datautil.feature_rw import h5load_from, get_kth_row, h5_open
+from news_popularity_prediction.datautil.feature_rw import h5load_from, h5store_at, h5_open, h5_close, get_kth_row,\
+    get_target_value
+from news_popularity_prediction.discussion.features import get_branching_feature_names, get_usergraph_feature_names,\
+    get_temporal_feature_names
+
+
+def make_feature_matrices(features_folder,
+                          osn_focus):
+    # Read comparison lifetimes.
+    k_list_file_path = features_folder + "/k_list/focus_" + "post" + ".txt"
+    k_list = load_valid_k_list(k_list_file_path)
+
+    # Get feature names.
+    branching_feature_dict = dict()
+    usergraph_feature_dict = dict()
+    temporal_feature_dict = dict()
+    branching_feature_dict[osn_focus] = get_branching_feature_names(osn_name=osn_focus)
+    usergraph_feature_dict[osn_focus] = get_usergraph_feature_names(osn_name=osn_focus)
+    temporal_feature_dict[osn_focus] = get_temporal_feature_names(osn_name=osn_focus)
+
+    branching_feature_names_list_dict = dict()
+    usergraph_feature_names_list_dict = dict()
+    temporal_feature_names_list_dict = dict()
+
+    branching_feature_names_list_dict[osn_focus] = sorted(branching_feature_dict[osn_focus])
+    usergraph_feature_names_list_dict[osn_focus] = sorted(usergraph_feature_dict[osn_focus])
+    temporal_feature_names_list_dict[osn_focus] = sorted(temporal_feature_dict[osn_focus])
+
+    number_of_branching_features_dict = dict()
+    number_of_usergraph_features_dict = dict()
+    number_of_temporal_features_dict = dict()
+
+    number_of_branching_features_dict[osn_focus] = len(branching_feature_names_list_dict[osn_focus])
+    number_of_usergraph_features_dict[osn_focus] = len(usergraph_feature_names_list_dict[osn_focus])
+    number_of_temporal_features_dict[osn_focus] = len(temporal_feature_names_list_dict[osn_focus])
+
+    # Make dataset matrix at time t_{\infty}.
+    dataset_full_path = features_folder + "/dataset_full/dataset_full.h5"
+    h5_stores_and_keys = get_h5_stores_and_keys(features_folder,
+                                                "post")
+
+    dataset_size = get_dataset_size(h5_stores_and_keys,
+                                    "post")
+
+    dataset_full,\
+    index = form_dataset_full(dataset_size,
+                              h5_stores_and_keys,
+                              osn_focus,
+                              branching_feature_names_list_dict,
+                              usergraph_feature_names_list_dict,
+                              temporal_feature_names_list_dict,
+                              number_of_branching_features_dict,
+                              number_of_usergraph_features_dict,
+                              number_of_temporal_features_dict)
+
+    store_dataset_full(dataset_full_path,
+                       dataset_full,
+                       index,
+                       branching_feature_names_list_dict,
+                       usergraph_feature_names_list_dict,
+                       temporal_feature_names_list_dict)
+
+
+def form_dataset_full(dataset_size,
+                      h5_stores_and_keys,
+                      osn_focus,
+                      branching_feature_names_list_dict,
+                      usergraph_feature_names_list_dict,
+                      temporal_feature_names_list_dict,
+                      number_of_branching_features_dict,
+                      number_of_usergraph_features_dict,
+                      number_of_temporal_features_dict):
+    osn_to_targetlist = dict()
+    if osn_focus == "reddit":
+        osn_to_targetlist["reddit"] = ["comments",
+                                       "users",
+                                       "score_wilson",
+                                       "controversiality_wilson"]
+    if osn_focus == "slashdot":
+        osn_to_targetlist["slashdot"] = ["comments",
+                                         "users"]
+
+    # Initialize full feature arrays.
+    dataset_full = dict()
+    index = dict()
+
+    for osn_name in osn_to_targetlist.keys():
+        dataset_full[osn_name] = dict()
+        index[osn_name] = list()
+
+        X_branching_full = np.empty((dataset_size,
+                                     number_of_branching_features_dict[osn_name]),
+                                    dtype=np.float64)
+        dataset_full[osn_name]["X_branching"] = X_branching_full
+
+        X_usergraph_full = np.empty((dataset_size,
+                                     number_of_usergraph_features_dict[osn_name]),
+                                    dtype=np.float64)
+        dataset_full[osn_name]["X_usergraph"] = X_usergraph_full
+
+        X_temporal_full = np.empty((dataset_size,
+                                    number_of_temporal_features_dict[osn_name]),
+                                   dtype=np.float64)
+        dataset_full[osn_name]["X_temporal"] = X_temporal_full
+
+        dataset_full[osn_name]["y_raw"] = dict()
+        for target_name in osn_to_targetlist[osn_name]:
+            dataset_full[osn_name]["y_raw"][target_name] = np.empty(dataset_size, dtype=np.float64)
+
+        # Fill full feature arrays.
+        offset = 0
+        for h5_store_files, h5_keys in h5_stores_and_keys:
+            index[osn_name].extend(h5_keys)
+            fill_X_handcrafted_full_and_y_raw(dataset_full,
+                                              h5_store_files,
+                                              h5_keys["post"],
+                                              offset,
+                                              osn_name,
+                                              osn_to_targetlist[osn_name],
+                                              branching_feature_names_list_dict,
+                                              usergraph_feature_names_list_dict,
+                                              temporal_feature_names_list_dict,
+                                              number_of_branching_features_dict,
+                                              number_of_usergraph_features_dict,
+                                              number_of_temporal_features_dict)
+
+            offset += len(h5_keys["post"])
+
+    return dataset_full, index
+
+
+def fill_X_handcrafted_full_and_y_raw(dataset_full,
+                                      h5_store_files,
+                                      h5_keys,
+                                      offset,
+                                      osn_name,
+                                      target_list,
+                                      branching_feature_names_list_dict,
+                                      usergraph_feature_names_list_dict,
+                                      temporal_feature_names_list_dict,
+                                      number_of_branching_features_dict,
+                                      number_of_usergraph_features_dict,
+                                      number_of_temporal_features_dict):
+    for d, h5_key in enumerate(h5_keys):
+        handcrafted_features_data_frame = h5load_from(h5_store_files[1], h5_key)
+
+        kth_row = get_kth_row(handcrafted_features_data_frame,
+                              -1,
+                              branching_feature_names_list_dict[osn_name])
+        dataset_full[osn_name]["X_branching"][offset + d, :number_of_branching_features_dict[osn_name]] = kth_row
+
+        kth_row = get_kth_row(handcrafted_features_data_frame,
+                              -1,
+                              usergraph_feature_names_list_dict[osn_name])
+        dataset_full[osn_name]["X_usergraph"][offset + d, :number_of_usergraph_features_dict[osn_name]] = kth_row
+
+        kth_row = get_kth_row(handcrafted_features_data_frame,
+                              -1,
+                              temporal_feature_names_list_dict[osn_name])
+        dataset_full[osn_name]["X_temporal"][offset + d, :number_of_temporal_features_dict[osn_name]] = kth_row
+
+        for target_name in target_list:
+            dataset_full[osn_name]["y_raw"][target_name][offset + d] = get_target_value(handcrafted_features_data_frame,
+                                                                                        target_name)
+
+"""
+def load_dataset_full(dataset_full_path):
+    dataset_full = dict()
+    dataset_full[target_osn_name] = dict()
+
+    index = dict()
+
+    h5_store = h5_open(dataset_full_path)
+
+    for osn_name in feature_osn_name_list:
+        df = h5load_from(h5_store, "/data/" + osn_name + "/X_branching")[branching_feature_names_list_dict[osn_name]]
+        # index[osn_name] = df.index
+        dataset_full[osn_name]["X_branching"] = df.values
+        dataset_full[osn_name]["X_usergraph"] = h5load_from(h5_store, "/data/" + osn_name + "/X_usergraph")[usergraph_feature_names_list_dict[osn_name]].values
+        dataset_full[osn_name]["X_temporal"] = h5load_from(h5_store, "/data/" + osn_name + "/X_temporal")[temporal_feature_names_list_dict[osn_name]].values
+
+    data_frame = h5load_from(h5_store, "/data/" + target_osn_name + "/y_raw")
+    dataset_full[target_osn_name]["y_raw"] = dict()
+    for target_name in target_name_list:
+        dataset_full[target_osn_name]["y_raw"][target_name] = data_frame[target_name].values
+
+    h5_close(h5_store)
+
+    return dataset_full, index
+"""
+
+def store_dataset_full(dataset_full_path,
+                       dataset_full,
+                       index,
+                       branching_feature_names_list_dict,
+                       usergraph_feature_names_list_dict,
+                       temporal_feature_names_list_dict):
+    h5_store = h5_open(dataset_full_path)
+
+    for osn_name in dataset_full.keys():
+        h5store_at(h5_store, osn_name + "/X_branching", pd.DataFrame(dataset_full[osn_name]["X_branching"],
+                                                                     columns=branching_feature_names_list_dict[osn_name]))
+        h5store_at(h5_store, osn_name + "/X_usergraph", pd.DataFrame(dataset_full[osn_name]["X_usergraph"],
+                                                                     columns=usergraph_feature_names_list_dict[osn_name]))
+        h5store_at(h5_store, osn_name + "/X_temporal", pd.DataFrame(dataset_full[osn_name]["X_temporal"],
+                                                                    columns=temporal_feature_names_list_dict[osn_name]))
+
+        y_raw_dict = dict()
+        for target_name in dataset_full[osn_name]["y_raw"].keys():
+            y_raw_dict[target_name] = dataset_full[osn_name]["y_raw"][target_name]
+
+        h5store_at(h5_store, osn_name + "/y_raw", pd.DataFrame(y_raw_dict))
+
+    h5_close(h5_store)
 
 
 def calculate_comparison_lifetimes(features_folder,
@@ -13,6 +227,20 @@ def calculate_comparison_lifetimes(features_folder,
     if osn_focus is None:
         osn_focus = "post"
 
+    h5_stores_and_keys = get_h5_stores_and_keys(features_folder,
+                                                osn_focus)
+
+    t_list = get_valid_k_list(h5_stores_and_keys,
+                              osn_focus)
+
+    k_list_path = features_folder + "/k_list/focus_" + osn_focus + ".txt"
+
+    store_valid_k_list(k_list_path,
+                       t_list)
+
+
+def get_h5_stores_and_keys(features_folder,
+                           osn_focus):
     # This is a list of all the .h5 files as produced after preprocessing.
     h5_store_file_name_list = os.listdir(features_folder)
     h5_store_file_name_list = [h5_store_file_name for h5_store_file_name in sorted(h5_store_file_name_list) if not h5_store_file_name[-1] == "~"]
@@ -38,13 +266,7 @@ def calculate_comparison_lifetimes(features_folder,
                                     handcrafted_features_h5_store_file),
                                    keys_dict))
 
-    t_list = get_valid_k_list(h5_stores_and_keys,
-                              osn_focus)
-
-    k_list_path = features_folder + "/k_list/focus_" + osn_focus + ".txt"
-
-    store_valid_k_list(k_list_path,
-                       t_list)
+    return h5_stores_and_keys
 
 
 def get_valid_k_list(h5_stores_and_keys,
