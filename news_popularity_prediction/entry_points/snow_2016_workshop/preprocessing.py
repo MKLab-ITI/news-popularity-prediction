@@ -14,7 +14,7 @@ from news_popularity_prediction.learning.cascade_lifetime import calculate_compa
 ########################################################################################################################
 # Configure feature extraction.
 ########################################################################################################################
-OUTPUT_DATA_FOLDER = "/home/georgerizos/Documents/test"
+OUTPUT_DATA_FOLDER = "/path/to/output/data/folder"
 ########################################################################################################################
 
 ########################################################################################################################
@@ -68,7 +68,7 @@ else:
 # Extract features for online discussions.
 ########################################################################################################################
 print("Extracting features for online discussions ...")
-"""
+
 # Extract features for RedditNews discussions.
 if reddit_flag:
     dataset_name = "reddit_news"
@@ -89,13 +89,13 @@ if barrapunto_flag:
     extract_features_static_dataset(dataset_name=dataset_name,
                                     input_data_folder=get_package_path() + "/news_post_data/" + dataset_name + "/anonymized_discussions",
                                     output_data_folder=OUTPUT_DATA_FOLDER + "/" + dataset_name + "/features")
-"""
+
 print("Features extracted.")
 ########################################################################################################################
 # Calculate the comparison lifetimes and form/store the corresponding feature matrices.
 ########################################################################################################################
 # Calculate the comparison lifetimes.
-"""
+
 print("Calculating the comparison lifetimes ...")
 if reddit_flag:
     dataset_name = "reddit_news"
@@ -111,7 +111,7 @@ if barrapunto_flag:
     dataset_name = "barrapunto"
     calculate_comparison_lifetimes(features_folder=OUTPUT_DATA_FOLDER + "/" + dataset_name + "/features",
                                    osn_focus=None)
-"""
+
 print("Lifetimes calculated.")
 
 # Form and store the feature matrices for the lifetimes.

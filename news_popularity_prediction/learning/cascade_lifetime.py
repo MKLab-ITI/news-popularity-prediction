@@ -10,6 +10,7 @@ from news_popularity_prediction.datautil.feature_rw import h5load_from, h5store_
     get_target_value
 from news_popularity_prediction.discussion.features import get_branching_feature_names, get_usergraph_feature_names,\
     get_temporal_feature_names
+from news_popularity_prediction.learning import concatenate_features
 
 
 def make_feature_matrices(features_folder,
@@ -67,6 +68,32 @@ def make_feature_matrices(features_folder,
                        branching_feature_names_list_dict,
                        usergraph_feature_names_list_dict,
                        temporal_feature_names_list_dict)
+
+    X_k_min_dict = dict()
+    X_t_next_dict = dict()
+    X_k_min_dict[osn_focus] = np.zeros(dataset_size, dtype=int)
+    X_t_next_dict[osn_focus] = np.zeros(dataset_size, dtype=float)
+    for k_index, k in enumerate(k_list):
+        dataset_k,\
+        X_k_min_dict,\
+        X_t_next_dict,\
+        index = form_dataset_k(dataset_size,
+                               h5_stores_and_keys,
+                               float(k),
+                               X_k_min_dict,
+                               X_t_next_dict,
+                               feature_osn_name_list=[osn_focus])
+
+        try:
+            dataset_k_path = features_folder + "/dataset_k/" + osn_focus + "_lifetime_" + k + "_dataset_k.h5"
+        except TypeError:
+            dataset_k_path = features_folder + "/dataset_k/" + osn_focus + "_lifetime_" + repr(k) + "_dataset_k.h5"
+
+        store_dataset_k(dataset_k_path,
+                        dataset_k,
+                        X_k_min_dict,
+                        X_t_next_dict,
+                        index)
 
 
 def form_dataset_full(dataset_size,
@@ -220,6 +247,152 @@ def store_dataset_full(dataset_full_path,
         h5store_at(h5_store, osn_name + "/y_raw", pd.DataFrame(y_raw_dict))
 
     h5_close(h5_store)
+
+"""
+def load_dataset_k(self,
+                   dataset_k_path):
+    dataset_k = dict()
+    X_k_min_dict = dict()
+    X_t_next_dict = dict()
+
+    index = dict()
+
+    h5_store = h5_open(dataset_k_path)
+
+    for osn_name in self.feature_osn_name_list:
+        dataset_k[osn_name] = dict()
+
+        df = h5load_from(h5_store, "/data/" + osn_name + "/X_branching")[self.branching_feature_names_list_dict[osn_name]]
+        # index[osn_name] = df.index
+
+        dataset_k[osn_name]["X_branching"] = df.values
+        dataset_k[osn_name]["X_usergraph"] = h5load_from(h5_store, "/data/" + osn_name + "/X_usergraph")[self.usergraph_feature_names_list_dict[osn_name]].values
+        dataset_k[osn_name]["X_temporal"] = h5load_from(h5_store, "/data/" + osn_name + "/X_temporal")[self.temporal_feature_names_list_dict[osn_name]].values
+
+        data_frame = h5load_from(h5_store, "/data/" + osn_name + "/utility_arrays")
+        X_k_min_dict[osn_name] = data_frame["X_k_min_array"].values
+        X_t_next_dict[osn_name] = data_frame["X_t_next_array"].values
+
+    h5_close(h5_store)
+
+    return dataset_k, X_k_min_dict, X_t_next_dict, index
+"""
+
+def store_dataset_k(dataset_k_path,
+                    dataset_k,
+                    X_k_min_dict,
+                    X_t_next_dict,
+                    index):
+
+    h5_store = h5_open(dataset_k_path)
+
+    for osn_name in dataset_k.keys():
+        h5store_at(h5_store, osn_name + "/X_branching", pd.DataFrame(dataset_k[osn_name]["X_branching"],
+                                                                     columns=sorted(list(get_branching_feature_names(osn_name)))))
+        h5store_at(h5_store, osn_name + "/X_usergraph", pd.DataFrame(dataset_k[osn_name]["X_usergraph"],
+                                                                     columns=sorted(list(get_usergraph_feature_names(osn_name)))))
+        h5store_at(h5_store, osn_name + "/X_temporal", pd.DataFrame(dataset_k[osn_name]["X_temporal"],
+                                                                    columns=sorted(list(get_temporal_feature_names(osn_name)))))
+
+        utility_arrays = dict()
+        utility_arrays["X_k_min_array"] = X_k_min_dict[osn_name]
+        utility_arrays["X_t_next_array"] = X_t_next_dict[osn_name]
+
+        h5store_at(h5_store, osn_name + "/utility_arrays", pd.DataFrame(utility_arrays))
+
+    h5_close(h5_store)
+
+
+def form_dataset_k(dataset_size,
+                   h5_stores_and_keys,
+                   k,
+                   X_k_min_dict,
+                   X_t_next_dict,
+                   feature_osn_name_list):
+    all_feature_osn_names = feature_osn_name_list
+
+    dataset_k = dict()
+    index = dict()
+
+    if True:
+        for osn_index, osn_name in enumerate(all_feature_osn_names):
+            dataset_k[osn_name] = dict()
+            index[osn_name] = list()
+
+            X_branching_k = np.empty((dataset_size,
+                                      10),
+                                     dtype=np.float64)
+            dataset_k[osn_name]["X_branching"] = X_branching_k
+
+            X_usergraph_k = np.empty((dataset_size,
+                                      7),
+                                     dtype=np.float64)
+            dataset_k[osn_name]["X_usergraph"] = X_usergraph_k
+
+            X_temporal_k = np.empty((dataset_size,
+                                     4),
+                                    dtype=np.float64)
+            dataset_k[osn_name]["X_temporal"] = X_temporal_k
+
+            # Fill full feature arrays.
+            offset = 0
+            for h5_store_files, h5_keys in h5_stores_and_keys:
+                index[osn_name].extend(h5_keys)
+
+                calculate_k_based_on_lifetime(dataset_k, h5_store_files, h5_keys, offset, k, X_k_min_dict, X_t_next_dict, osn_name)
+
+                fill_X_handcrafted_k(dataset_k, h5_store_files, h5_keys["post"], offset, k, X_k_min_dict, X_t_next_dict, osn_name)
+                offset += len(h5_keys["post"])
+
+    return dataset_k, X_k_min_dict, X_t_next_dict, index
+
+
+def calculate_k_based_on_lifetime(dataset_k,
+                                  h5_store_files,
+                                  h5_keys,
+                                  offset,
+                                  k,
+                                  X_k_min_dict,
+                                  X_t_next_dict,
+                                  osn_name):
+    number_of_keys = len(h5_keys["post"])
+
+    for d in range(number_of_keys):
+        timestamps_data_frame = h5load_from(h5_store_files[0], h5_keys["post"][d])
+
+        if np.isnan(X_t_next_dict[osn_name][offset + d]):
+            continue
+
+        observed_comments,\
+        next_lifetime = get_k_based_on_lifetime(timestamps_data_frame,
+                                                k,
+                                                min_k=X_k_min_dict[osn_name][offset + d],
+                                                max_k=-1)
+
+        X_k_min_dict[osn_name][offset + d] = observed_comments
+        X_t_next_dict[osn_name][offset + d] = next_lifetime
+
+
+def fill_X_handcrafted_k(dataset_k,
+                         h5_store_files,
+                         h5_keys,
+                         offset,
+                         k,
+                         X_k_min_dict,
+                         X_t_next_dict,
+                         osn_name):
+
+        concatenate_features.fill_X_handcrafted_k_actual(dataset_k,
+                                                         h5_store_files,
+                                                         h5_keys,
+                                                         offset,
+                                                         k,
+                                                         X_k_min_dict,
+                                                         X_t_next_dict,
+                                                         sorted(list(get_branching_feature_names(osn_name))),
+                                                         sorted(list(get_usergraph_feature_names(osn_name))),
+                                                         sorted(list(get_temporal_feature_names(osn_name))),
+                                                         osn_name)
 
 
 def calculate_comparison_lifetimes(features_folder,
