@@ -548,18 +548,26 @@ class DiscussionModellingExperiment:
         h5_store = h5_open(dataset_full_path)
 
         for osn_name in dataset_full.keys():
-            h5store_at(h5_store, osn_name + "/X_branching", pd.DataFrame(dataset_full[osn_name]["X_branching"],
-                                                                         columns=self.branching_feature_names_list_dict[osn_name]))
-            h5store_at(h5_store, osn_name + "/X_usergraph", pd.DataFrame(dataset_full[osn_name]["X_usergraph"],
-                                                                         columns=self.usergraph_feature_names_list_dict[osn_name]))
-            h5store_at(h5_store, osn_name + "/X_temporal", pd.DataFrame(dataset_full[osn_name]["X_temporal"],
-                                                                        columns=self.temporal_feature_names_list_dict[osn_name]))
+            h5store_at(h5_store,
+                       "/data/" + osn_name + "/X_branching",
+                       pd.DataFrame(dataset_full[osn_name]["X_branching"],
+                                    columns=self.branching_feature_names_list_dict[osn_name]))
+            h5store_at(h5_store,
+                       "/data/" + osn_name + "/X_usergraph",
+                       pd.DataFrame(dataset_full[osn_name]["X_usergraph"],
+                                    columns=self.usergraph_feature_names_list_dict[osn_name]))
+            h5store_at(h5_store,
+                       "/data/" + osn_name + "/X_temporal",
+                       pd.DataFrame(dataset_full[osn_name]["X_temporal"],
+                                    columns=self.temporal_feature_names_list_dict[osn_name]))
 
             y_raw_dict = dict()
             for target_name in dataset_full[osn_name]["y_raw"].keys():
                 y_raw_dict[target_name] = dataset_full[osn_name]["y_raw"][target_name]
 
-            h5store_at(h5_store, osn_name + "/y_raw", pd.DataFrame(y_raw_dict))
+            h5store_at(h5_store,
+                       "/data/" + osn_name + "/y_raw",
+                       pd.DataFrame(y_raw_dict))
 
         h5_close(h5_store)
 
@@ -720,18 +728,26 @@ class DiscussionModellingExperiment:
         h5_store = h5_open(dataset_k_path)
 
         for osn_name in dataset_k.keys():
-            h5store_at(h5_store, osn_name + "/X_branching", pd.DataFrame(dataset_k[osn_name]["X_branching"],
-                                                                         columns=self.branching_feature_names_list_dict[osn_name]))
-            h5store_at(h5_store, osn_name + "/X_usergraph", pd.DataFrame(dataset_k[osn_name]["X_usergraph"],
-                                                                         columns=self.usergraph_feature_names_list_dict[osn_name]))
-            h5store_at(h5_store, osn_name + "/X_temporal", pd.DataFrame(dataset_k[osn_name]["X_temporal"],
-                                                                        columns=self.temporal_feature_names_list_dict[osn_name]))
+            h5store_at(h5_store,
+                       "/data/" + osn_name + "/X_branching",
+                       pd.DataFrame(dataset_k[osn_name]["X_branching"],
+                                    columns=self.branching_feature_names_list_dict[osn_name]))
+            h5store_at(h5_store,
+                       "/data/" + osn_name + "/X_usergraph",
+                       pd.DataFrame(dataset_k[osn_name]["X_usergraph"],
+                                    columns=self.usergraph_feature_names_list_dict[osn_name]))
+            h5store_at(h5_store,
+                       "/data/" + osn_name + "/X_temporal",
+                       pd.DataFrame(dataset_k[osn_name]["X_temporal"],
+                                    columns=self.temporal_feature_names_list_dict[osn_name]))
 
             utility_arrays = dict()
             utility_arrays["X_k_min_array"] = X_k_min_dict[osn_name]
             utility_arrays["X_t_next_array"] = X_t_next_dict[osn_name]
 
-            h5store_at(h5_store, osn_name + "/utility_arrays", pd.DataFrame(utility_arrays))
+            h5store_at(h5_store,
+                       "/data/" + osn_name + "/utility_arrays",
+                       pd.DataFrame(utility_arrays))
 
         h5_close(h5_store)
 

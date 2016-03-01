@@ -6,8 +6,7 @@ import statistics
 import numpy as np
 import pandas as pd
 
-from news_popularity_prediction.datautil.feature_rw import h5load_from, h5store_at, h5_open, h5_close, get_kth_row,\
-    get_target_value
+from news_popularity_prediction.datautil.feature_rw import h5load_from, h5store_at, h5_open, h5_close, get_target_value
 from news_popularity_prediction.discussion.features import get_branching_feature_names, get_usergraph_feature_names,\
     get_temporal_feature_names
 from news_popularity_prediction.learning import concatenate_features
@@ -233,18 +232,26 @@ def store_dataset_full(dataset_full_path,
     h5_store = h5_open(dataset_full_path)
 
     for osn_name in dataset_full.keys():
-        h5store_at(h5_store, osn_name + "/X_branching", pd.DataFrame(dataset_full[osn_name]["X_branching"],
-                                                                     columns=branching_feature_names_list_dict[osn_name]))
-        h5store_at(h5_store, osn_name + "/X_usergraph", pd.DataFrame(dataset_full[osn_name]["X_usergraph"],
-                                                                     columns=usergraph_feature_names_list_dict[osn_name]))
-        h5store_at(h5_store, osn_name + "/X_temporal", pd.DataFrame(dataset_full[osn_name]["X_temporal"],
-                                                                    columns=temporal_feature_names_list_dict[osn_name]))
+        h5store_at(h5_store,
+                   "/data/" + osn_name + "/X_branching",
+                   pd.DataFrame(dataset_full[osn_name]["X_branching"],
+                                columns=branching_feature_names_list_dict[osn_name]))
+        h5store_at(h5_store,
+                   "/data/" + osn_name + "/X_usergraph",
+                   pd.DataFrame(dataset_full[osn_name]["X_usergraph"],
+                                columns=usergraph_feature_names_list_dict[osn_name]))
+        h5store_at(h5_store,
+                   "/data/" + osn_name + "/X_temporal",
+                   pd.DataFrame(dataset_full[osn_name]["X_temporal"],
+                                columns=temporal_feature_names_list_dict[osn_name]))
 
         y_raw_dict = dict()
         for target_name in dataset_full[osn_name]["y_raw"].keys():
             y_raw_dict[target_name] = dataset_full[osn_name]["y_raw"][target_name]
 
-        h5store_at(h5_store, osn_name + "/y_raw", pd.DataFrame(y_raw_dict))
+        h5store_at(h5_store,
+                   "/data/" + osn_name + "/y_raw",
+                   pd.DataFrame(y_raw_dict))
 
     h5_close(h5_store)
 
@@ -287,18 +294,26 @@ def store_dataset_k(dataset_k_path,
     h5_store = h5_open(dataset_k_path)
 
     for osn_name in dataset_k.keys():
-        h5store_at(h5_store, osn_name + "/X_branching", pd.DataFrame(dataset_k[osn_name]["X_branching"],
-                                                                     columns=sorted(list(get_branching_feature_names(osn_name)))))
-        h5store_at(h5_store, osn_name + "/X_usergraph", pd.DataFrame(dataset_k[osn_name]["X_usergraph"],
-                                                                     columns=sorted(list(get_usergraph_feature_names(osn_name)))))
-        h5store_at(h5_store, osn_name + "/X_temporal", pd.DataFrame(dataset_k[osn_name]["X_temporal"],
-                                                                    columns=sorted(list(get_temporal_feature_names(osn_name)))))
+        h5store_at(h5_store,
+                   "/data/" + osn_name + "/X_branching",
+                   pd.DataFrame(dataset_k[osn_name]["X_branching"],
+                                columns=sorted(list(get_branching_feature_names(osn_name)))))
+        h5store_at(h5_store,
+                   "/data/" + osn_name + "/X_usergraph",
+                   pd.DataFrame(dataset_k[osn_name]["X_usergraph"],
+                                columns=sorted(list(get_usergraph_feature_names(osn_name)))))
+        h5store_at(h5_store,
+                   "/data/" + osn_name + "/X_temporal",
+                   pd.DataFrame(dataset_k[osn_name]["X_temporal"],
+                                columns=sorted(list(get_temporal_feature_names(osn_name)))))
 
         utility_arrays = dict()
         utility_arrays["X_k_min_array"] = X_k_min_dict[osn_name]
         utility_arrays["X_t_next_array"] = X_t_next_dict[osn_name]
 
-        h5store_at(h5_store, osn_name + "/utility_arrays", pd.DataFrame(utility_arrays))
+        h5store_at(h5_store,
+                   "/data/" + osn_name + "/utility_arrays",
+                   pd.DataFrame(utility_arrays))
 
     h5_close(h5_store)
 
@@ -568,3 +583,26 @@ def get_k_based_on_lifetime(data_frame, lifetime, min_k, max_k):
         next_t = np.nan
 
     return k, next_t
+
+
+def get_cascade_lifetime(data_frame):
+    timestamp_col = data_frame["timestamp"]
+    cascade_source_timestamp = timestamp_col.iloc[0]
+    last_comment_timestamp = timestamp_col.iloc[-1]
+
+    cascade_lifetime = last_comment_timestamp - cascade_source_timestamp
+    return cascade_lifetime
+
+
+def get_kth_row(data_frame, k, feature_list):
+    row = data_frame[feature_list]
+    row = row.iloc[k]
+
+    return row
+
+
+def get_kth_col(data_frame, k, feature_list):
+    col = data_frame[feature_list]
+    col = col.iloc[:, k]
+
+    return col

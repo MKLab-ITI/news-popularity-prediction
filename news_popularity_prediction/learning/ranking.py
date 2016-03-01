@@ -70,19 +70,29 @@ def store_k_evaluation_measures(store_path,
 
     for fold_index in range(number_of_folds):
         data_frame = pd.DataFrame(k_evaluation_measures[0][:, fold_index], columns=["kendall_tau"], index=k_list)
-        h5store_at(h5_store, "kendall_tau/fold" + str(fold_index), data_frame)
+        h5store_at(h5_store,
+                   "/data/kendall_tau/fold" + str(fold_index),
+                   data_frame)
 
         data_frame = pd.DataFrame(k_evaluation_measures[1][:, fold_index], columns=["p_value"], index=k_list)
-        h5store_at(h5_store, "p_value/fold" + str(fold_index), data_frame)
+        h5store_at(h5_store,
+                   "/data/p_value/fold" + str(fold_index),
+                   data_frame)
 
         data_frame = pd.DataFrame(k_evaluation_measures[6][:, fold_index], columns=["mse"], index=k_list)
-        h5store_at(h5_store, "mse/fold" + str(fold_index), data_frame)
+        h5store_at(h5_store,
+                   "/data/mse/fold" + str(fold_index),
+                   data_frame)
 
         data_frame = pd.DataFrame(k_evaluation_measures[7][:, fold_index], columns=["jaccard"], index=k_list)
-        h5store_at(h5_store, "top_k_jaccard/fold" + str(fold_index), data_frame)
+        h5store_at(h5_store,
+                   "/data/top_k_jaccard/fold" + str(fold_index),
+                   data_frame)
 
         data_frame = pd.DataFrame(k_evaluation_measures[8][:, fold_index, :], columns=feature_column_names, index=k_list)
-        h5store_at(h5_store, "feature_importances/fold" + str(fold_index), data_frame)
+        h5store_at(h5_store,
+                   "/data/feature_importances/fold" + str(fold_index),
+                   data_frame)
 
     h5_close(h5_store)
 
