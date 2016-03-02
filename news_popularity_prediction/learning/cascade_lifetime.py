@@ -329,35 +329,34 @@ def form_dataset_k(dataset_size,
     dataset_k = dict()
     index = dict()
 
-    if True:
-        for osn_index, osn_name in enumerate(all_feature_osn_names):
-            dataset_k[osn_name] = dict()
-            index[osn_name] = list()
+    for osn_index, osn_name in enumerate(all_feature_osn_names):
+        dataset_k[osn_name] = dict()
+        index[osn_name] = list()
 
-            X_branching_k = np.empty((dataset_size,
-                                      10),
-                                     dtype=np.float64)
-            dataset_k[osn_name]["X_branching"] = X_branching_k
+        X_branching_k = np.empty((dataset_size,
+                                  10),
+                                 dtype=np.float64)
+        dataset_k[osn_name]["X_branching"] = X_branching_k
 
-            X_usergraph_k = np.empty((dataset_size,
-                                      7),
-                                     dtype=np.float64)
-            dataset_k[osn_name]["X_usergraph"] = X_usergraph_k
+        X_usergraph_k = np.empty((dataset_size,
+                                  7),
+                                 dtype=np.float64)
+        dataset_k[osn_name]["X_usergraph"] = X_usergraph_k
 
-            X_temporal_k = np.empty((dataset_size,
-                                     4),
-                                    dtype=np.float64)
-            dataset_k[osn_name]["X_temporal"] = X_temporal_k
+        X_temporal_k = np.empty((dataset_size,
+                                 4),
+                                dtype=np.float64)
+        dataset_k[osn_name]["X_temporal"] = X_temporal_k
 
-            # Fill full feature arrays.
-            offset = 0
-            for h5_store_files, h5_keys in h5_stores_and_keys:
-                index[osn_name].extend(h5_keys)
+        # Fill full feature arrays.
+        offset = 0
+        for h5_store_files, h5_keys in h5_stores_and_keys:
+            index[osn_name].extend(h5_keys)
 
-                calculate_k_based_on_lifetime(dataset_k, h5_store_files, h5_keys, offset, k, X_k_min_dict, X_t_next_dict, osn_name)
+            calculate_k_based_on_lifetime(dataset_k, h5_store_files, h5_keys, offset, k, X_k_min_dict, X_t_next_dict, osn_name)
 
-                fill_X_handcrafted_k(dataset_k, h5_store_files, h5_keys["post"], offset, k, X_k_min_dict, X_t_next_dict, osn_name)
-                offset += len(h5_keys["post"])
+            fill_X_handcrafted_k(dataset_k, h5_store_files, h5_keys["post"], offset, k, X_k_min_dict, X_t_next_dict, osn_name)
+            offset += len(h5_keys["post"])
 
     return dataset_k, X_k_min_dict, X_t_next_dict, index
 

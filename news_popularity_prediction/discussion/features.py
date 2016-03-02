@@ -14,9 +14,10 @@ from news_popularity_prediction.features import basic_wrappers, branching_wrappe
 
 def get_handcrafted_feature_names(dataset):
     """
-    Returns a set of feature names to be calculated.
+    Returns a set of all the names of the engineered features.
 
-    Output: - names: A set of strings, corresponding to the features to be calculated.
+    :param dataset: The name of the dataset (i.e. reddit, slashdot, barrapunto)
+    :return: names: The set of feature names.
     """
     names = set()
 
@@ -61,6 +62,12 @@ def get_handcrafted_feature_names(dataset):
 
 
 def get_branching_feature_names(osn_name):
+    """
+    Returns a set of the names of the comment tree engineered features.
+
+    :param osn_name: The name of the dataset (i.e. reddit, slashdot, barrapunto)
+    :return: names: The set of feature names.
+    """
     names = set()
 
     ####################################################################################################################
@@ -85,6 +92,12 @@ def get_branching_feature_names(osn_name):
 
 
 def get_usergraph_feature_names(osn_name):
+    """
+    Returns a set of the names of the user graph engineered features.
+
+    :param osn_name: The name of the dataset (i.e. reddit, slashdot, barrapunto)
+    :return: names: The set of feature names.
+    """
     names = set()
 
     ####################################################################################################################
@@ -102,6 +115,12 @@ def get_usergraph_feature_names(osn_name):
 
 
 def get_temporal_feature_names(osn_name):
+    """
+    Returns a set of the names of the temporal engineered features.
+
+    :param osn_name: The name of the dataset (i.e. reddit, slashdot, barrapunto)
+    :return: names: The set of feature names.
+    """
     names = set()
 
     ####################################################################################################################

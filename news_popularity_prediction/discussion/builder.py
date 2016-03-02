@@ -316,7 +316,6 @@ def safe_comment_generator(document,
             # Update discussion tree.
             children_dict[parent_comment_id].append(comment_id)
 
-
         # Starting from the root/initial post, we get the children and we put them in a priority queue.
         priority_queue = list()
 

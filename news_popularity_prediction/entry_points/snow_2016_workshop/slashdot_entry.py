@@ -11,7 +11,7 @@ EXPERIMENT_CONSTRUCTION_TYPE["add_temporal_features"] = False
 EXPERIMENT_CONSTRUCTION_TYPE["baseline"] = "mean"
 
 DATA_FOLDER = "Gomez/SlashDot"
-FEATURE_OSN_NAME_LIST = ["slashdot"]  # If more than one, it is a JOINT experiment.
+FEATURE_OSN_NAME_LIST = ["slashdot"]
 TARGET_OSN_NAME = "slashdot"  # OSN targets.
 OSN_NAME_FOCUS = "slashdot"  # OSN-based timestamps.
 TARGET_NAME_LIST = ["comments", "users"]
@@ -35,7 +35,7 @@ EXPERIMENT_CONSTRUCTION_TYPE["add_temporal_features"] = False
 EXPERIMENT_CONSTRUCTION_TYPE["baseline"] = "median"
 
 DATA_FOLDER = "Gomez/SlashDot"
-FEATURE_OSN_NAME_LIST = ["slashdot"]  # If more than one, it is a JOINT experiment.
+FEATURE_OSN_NAME_LIST = ["slashdot"]
 TARGET_OSN_NAME = "slashdot"  # OSN targets.
 OSN_NAME_FOCUS = "slashdot"  # OSN-based timestamps.
 TARGET_NAME_LIST = ["comments", "users"]
@@ -59,7 +59,7 @@ EXPERIMENT_CONSTRUCTION_TYPE["add_temporal_features"] = False
 EXPERIMENT_CONSTRUCTION_TYPE["baseline"] = "comments"
 
 DATA_FOLDER = "Gomez/SlashDot"
-FEATURE_OSN_NAME_LIST = ["slashdot"]  # If more than one, it is a JOINT experiment.
+FEATURE_OSN_NAME_LIST = ["slashdot"]
 TARGET_OSN_NAME = "slashdot"  # OSN targets.
 OSN_NAME_FOCUS = "slashdot"  # OSN-based timestamps.
 TARGET_NAME_LIST = ["comments", "users"]
@@ -83,7 +83,7 @@ EXPERIMENT_CONSTRUCTION_TYPE["add_temporal_features"] = False
 EXPERIMENT_CONSTRUCTION_TYPE["baseline"] = "users"
 
 DATA_FOLDER = "Gomez/SlashDot"
-FEATURE_OSN_NAME_LIST = ["slashdot"]  # If more than one, it is a JOINT experiment.
+FEATURE_OSN_NAME_LIST = ["slashdot"]
 TARGET_OSN_NAME = "slashdot"  # OSN targets.
 OSN_NAME_FOCUS = "slashdot"  # OSN-based timestamps.
 TARGET_NAME_LIST = ["comments", "users"]
@@ -107,7 +107,7 @@ EXPERIMENT_CONSTRUCTION_TYPE["add_temporal_features"] = False
 EXPERIMENT_CONSTRUCTION_TYPE["baseline"] = "comments_users"
 
 DATA_FOLDER = "Gomez/SlashDot"
-FEATURE_OSN_NAME_LIST = ["slashdot"]  # If more than one, it is a JOINT experiment.
+FEATURE_OSN_NAME_LIST = ["slashdot"]
 TARGET_OSN_NAME = "slashdot"  # OSN targets.
 OSN_NAME_FOCUS = "slashdot"  # OSN-based timestamps.
 TARGET_NAME_LIST = ["comments", "users"]
@@ -131,7 +131,7 @@ EXPERIMENT_CONSTRUCTION_TYPE["add_temporal_features"] = False
 EXPERIMENT_CONSTRUCTION_TYPE["baseline"] = "simple graph"
 
 DATA_FOLDER = "Gomez/SlashDot"
-FEATURE_OSN_NAME_LIST = ["slashdot"]  # If more than one, it is a JOINT experiment.
+FEATURE_OSN_NAME_LIST = ["slashdot"]
 TARGET_OSN_NAME = "slashdot"  # OSN targets.
 OSN_NAME_FOCUS = "slashdot"  # OSN-based timestamps.
 TARGET_NAME_LIST = ["comments", "users"]
@@ -155,7 +155,7 @@ EXPERIMENT_CONSTRUCTION_TYPE["add_usergraph_features"] = True
 EXPERIMENT_CONSTRUCTION_TYPE["add_temporal_features"] = False
 
 DATA_FOLDER = "Gomez/SlashDot"
-FEATURE_OSN_NAME_LIST = ["slashdot"]  # If more than one, it is a JOINT experiment.
+FEATURE_OSN_NAME_LIST = ["slashdot"]
 TARGET_OSN_NAME = "slashdot"  # OSN targets.
 OSN_NAME_FOCUS = "slashdot"  # OSN-based timestamps.
 TARGET_NAME_LIST = ["comments", "users"]
@@ -177,7 +177,7 @@ EXPERIMENT_CONSTRUCTION_TYPE["add_usergraph_features"] = False
 EXPERIMENT_CONSTRUCTION_TYPE["add_temporal_features"] = False
 
 DATA_FOLDER = "Gomez/SlashDot"
-FEATURE_OSN_NAME_LIST = ["slashdot"]  # If more than one, it is a JOINT experiment.
+FEATURE_OSN_NAME_LIST = ["slashdot"]
 TARGET_OSN_NAME = "slashdot"  # OSN targets.
 OSN_NAME_FOCUS = "slashdot"  # OSN-based timestamps.
 TARGET_NAME_LIST = ["comments", "users"]
@@ -199,7 +199,7 @@ EXPERIMENT_CONSTRUCTION_TYPE["add_usergraph_features"] = True
 EXPERIMENT_CONSTRUCTION_TYPE["add_temporal_features"] = False
 
 DATA_FOLDER = "Gomez/SlashDot"
-FEATURE_OSN_NAME_LIST = ["slashdot"]  # If more than one, it is a JOINT experiment.
+FEATURE_OSN_NAME_LIST = ["slashdot"]
 TARGET_OSN_NAME = "slashdot"  # OSN targets.
 OSN_NAME_FOCUS = "slashdot"  # OSN-based timestamps.
 TARGET_NAME_LIST = ["comments", "users"]
@@ -221,7 +221,7 @@ EXPERIMENT_CONSTRUCTION_TYPE["add_usergraph_features"] = False
 EXPERIMENT_CONSTRUCTION_TYPE["add_temporal_features"] = True
 
 DATA_FOLDER = "Gomez/SlashDot"
-FEATURE_OSN_NAME_LIST = ["slashdot"]  # If more than one, it is a JOINT experiment.
+FEATURE_OSN_NAME_LIST = ["slashdot"]
 TARGET_OSN_NAME = "slashdot"  # OSN targets.
 OSN_NAME_FOCUS = "slashdot"  # OSN-based timestamps.
 TARGET_NAME_LIST = ["comments", "users"]
@@ -243,7 +243,7 @@ EXPERIMENT_CONSTRUCTION_TYPE["add_usergraph_features"] = True
 EXPERIMENT_CONSTRUCTION_TYPE["add_temporal_features"] = True
 
 DATA_FOLDER = "Gomez/SlashDot"
-FEATURE_OSN_NAME_LIST = ["slashdot"]  # If more than one, it is a JOINT experiment.
+FEATURE_OSN_NAME_LIST = ["slashdot"]
 TARGET_OSN_NAME = "slashdot"  # OSN targets.
 OSN_NAME_FOCUS = "slashdot"  # OSN-based timestamps.
 TARGET_NAME_LIST = ["comments", "users"]

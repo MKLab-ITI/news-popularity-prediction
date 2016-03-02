@@ -9,6 +9,15 @@ def get_within_dataset_user_anonymization(output_file,
                                           document_gen,
                                           comment_generator,
                                           extract_user_name):
+    """
+    Either reads or calculates a dictionary anonymizer from user name to anonymized integer id.
+
+    :param output_file: The file path where the map will be stored.
+    :param document_gen: A generator that yields dictionaries containing online discussions.
+    :param comment_generator: Returns a generator that yields the comments from an online discussion.
+    :param extract_user_name: Extracts the user name from a comment.
+    :return: within_dataset_user_anonymize: The map from raw data user names to anonymized integer ids.
+    """
     if os.path.exists(output_file):
         within_dataset_user_anonymize = load_dataset_user_anonymizer(output_file)
     else:
@@ -27,7 +36,13 @@ def calculate_within_dataset_user_anonymization(document_gen,
                                                 comment_generator,
                                                 extract_user_name):
     """
-    Reads all distinct users in the dataset and anonymizes them.
+    Calculates a dictionary anonymizer from user name to anonymized integer id.
+
+    :param document_gen: A generator that yields dictionaries containing online discussions.
+    :param comment_generator: Returns a generator that yields the comments from an online discussion.
+    :param extract_user_name: Extracts the user name from a comment.
+    :return: user_name_set: A set of raw data user names.
+             within_dataset_user_anonymize: The map from raw data user names to anonymized integer ids.
     """
     # Initialize user set.
     user_name_set = list()
@@ -67,9 +82,21 @@ def calculate_within_dataset_user_anonymization(document_gen,
 
 def store_dataset_user_anonymizer(output_file,
                                   within_dataset_user_anonymize):
+    """
+    Stores the dictionary anonymizer from user name to anonymized integer id.
+    :param output_file: The file path where the map will be stored.
+    :param within_dataset_user_anonymize: The map from raw data user names to anonymized integer ids.
+    :return: None
+    """
     store_pickle(output_file, within_dataset_user_anonymize)
 
 
 def load_dataset_user_anonymizer(output_file):
+    """
+    Loads the dictionary anonymizer from user name to anonymized integer id.
+
+    :param output_file: The file path where the map is stored.
+    :return: within_dataset_user_anonymize: The map from raw data user names to anonymized integer ids.
+    """
     within_dataset_user_anonymize = load_pickle(output_file)
     return within_dataset_user_anonymize

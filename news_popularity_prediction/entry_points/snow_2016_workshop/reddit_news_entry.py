@@ -10,7 +10,7 @@ EXPERIMENT_CONSTRUCTION_TYPE["add_temporal_features"] = False
 EXPERIMENT_CONSTRUCTION_TYPE["baseline"] = "mean"
 
 DATA_FOLDER = "Rizos/Reddit_News"
-FEATURE_OSN_NAME_LIST = ["reddit"]  # If more than one, it is a JOINT experiment.
+FEATURE_OSN_NAME_LIST = ["reddit"]
 TARGET_OSN_NAME = "reddit"  # OSN targets.
 OSN_NAME_FOCUS = "reddit"  # OSN-based timestamps.
 TARGET_NAME_LIST = ["comments", "users", "score_wilson", "controversiality_wilson"]
@@ -34,7 +34,7 @@ EXPERIMENT_CONSTRUCTION_TYPE["add_temporal_features"] = False
 EXPERIMENT_CONSTRUCTION_TYPE["baseline"] = "median"
 
 DATA_FOLDER = "Rizos/Reddit_News"
-FEATURE_OSN_NAME_LIST = ["reddit"]  # If more than one, it is a JOINT experiment.
+FEATURE_OSN_NAME_LIST = ["reddit"]
 TARGET_OSN_NAME = "reddit"  # OSN targets.
 OSN_NAME_FOCUS = "reddit"  # OSN-based timestamps.
 TARGET_NAME_LIST = ["comments", "users", "score_wilson", "controversiality_wilson"]
@@ -58,7 +58,7 @@ EXPERIMENT_CONSTRUCTION_TYPE["add_temporal_features"] = False
 EXPERIMENT_CONSTRUCTION_TYPE["baseline"] = "comments"
 
 DATA_FOLDER = "Rizos/Reddit_News"
-FEATURE_OSN_NAME_LIST = ["reddit"]  # If more than one, it is a JOINT experiment.
+FEATURE_OSN_NAME_LIST = ["reddit"]
 TARGET_OSN_NAME = "reddit"  # OSN targets.
 OSN_NAME_FOCUS = "reddit"  # OSN-based timestamps.
 TARGET_NAME_LIST = ["comments", "users", "score_wilson", "controversiality_wilson"]
@@ -82,7 +82,7 @@ EXPERIMENT_CONSTRUCTION_TYPE["add_temporal_features"] = False
 EXPERIMENT_CONSTRUCTION_TYPE["baseline"] = "users"
 
 DATA_FOLDER = "Rizos/Reddit_News"
-FEATURE_OSN_NAME_LIST = ["reddit"]  # If more than one, it is a JOINT experiment.
+FEATURE_OSN_NAME_LIST = ["reddit"]
 TARGET_OSN_NAME = "reddit"  # OSN targets.
 OSN_NAME_FOCUS = "reddit"  # OSN-based timestamps.
 TARGET_NAME_LIST = ["comments", "users", "score_wilson", "controversiality_wilson"]
@@ -106,7 +106,7 @@ EXPERIMENT_CONSTRUCTION_TYPE["add_temporal_features"] = False
 EXPERIMENT_CONSTRUCTION_TYPE["baseline"] = "comments_users"
 
 DATA_FOLDER = "Rizos/Reddit_News"
-FEATURE_OSN_NAME_LIST = ["reddit"]  # If more than one, it is a JOINT experiment.
+FEATURE_OSN_NAME_LIST = ["reddit"]
 TARGET_OSN_NAME = "reddit"  # OSN targets.
 OSN_NAME_FOCUS = "reddit"  # OSN-based timestamps.
 TARGET_NAME_LIST = ["comments", "users", "score_wilson", "controversiality_wilson"]
@@ -130,7 +130,7 @@ EXPERIMENT_CONSTRUCTION_TYPE["add_temporal_features"] = False
 EXPERIMENT_CONSTRUCTION_TYPE["baseline"] = "simple graph"
 
 DATA_FOLDER = "Rizos/Reddit_News"
-FEATURE_OSN_NAME_LIST = ["reddit"]  # If more than one, it is a JOINT experiment.
+FEATURE_OSN_NAME_LIST = ["reddit"]
 TARGET_OSN_NAME = "reddit"  # OSN targets.
 OSN_NAME_FOCUS = "reddit"  # OSN-based timestamps.
 TARGET_NAME_LIST = ["comments", "users", "score_wilson", "controversiality_wilson"]
@@ -152,7 +152,7 @@ EXPERIMENT_CONSTRUCTION_TYPE["add_usergraph_features"] = True
 EXPERIMENT_CONSTRUCTION_TYPE["add_temporal_features"] = False
 
 DATA_FOLDER = "Rizos/Reddit_News"
-FEATURE_OSN_NAME_LIST = ["reddit"]  # If more than one, it is a JOINT experiment.
+FEATURE_OSN_NAME_LIST = ["reddit"]
 TARGET_OSN_NAME = "reddit"  # OSN targets.
 OSN_NAME_FOCUS = "reddit"  # OSN-based timestamps.
 TARGET_NAME_LIST = ["comments", "users", "score_wilson", "controversiality_wilson"]
@@ -174,7 +174,7 @@ EXPERIMENT_CONSTRUCTION_TYPE["add_usergraph_features"] = False
 EXPERIMENT_CONSTRUCTION_TYPE["add_temporal_features"] = False
 
 DATA_FOLDER = "Rizos/Reddit_News"
-FEATURE_OSN_NAME_LIST = ["reddit"]  # If more than one, it is a JOINT experiment.
+FEATURE_OSN_NAME_LIST = ["reddit"]
 TARGET_OSN_NAME = "reddit"  # OSN targets.
 OSN_NAME_FOCUS = "reddit"  # OSN-based timestamps.
 TARGET_NAME_LIST = ["comments", "users", "score_wilson", "controversiality_wilson"]
@@ -196,7 +196,7 @@ EXPERIMENT_CONSTRUCTION_TYPE["add_usergraph_features"] = True
 EXPERIMENT_CONSTRUCTION_TYPE["add_temporal_features"] = False
 
 DATA_FOLDER = "Rizos/Reddit_News"
-FEATURE_OSN_NAME_LIST = ["reddit"]  # If more than one, it is a JOINT experiment.
+FEATURE_OSN_NAME_LIST = ["reddit"]
 TARGET_OSN_NAME = "reddit"  # OSN targets.
 OSN_NAME_FOCUS = "reddit"  # OSN-based timestamps.
 TARGET_NAME_LIST = ["comments", "users", "score_wilson", "controversiality_wilson"]
@@ -218,7 +218,7 @@ EXPERIMENT_CONSTRUCTION_TYPE["add_usergraph_features"] = False
 EXPERIMENT_CONSTRUCTION_TYPE["add_temporal_features"] = True
 
 DATA_FOLDER = "Rizos/Reddit_News"
-FEATURE_OSN_NAME_LIST = ["reddit"]  # If more than one, it is a JOINT experiment.
+FEATURE_OSN_NAME_LIST = ["reddit"]
 TARGET_OSN_NAME = "reddit"  # OSN targets.
 OSN_NAME_FOCUS = "reddit"  # OSN-based timestamps.
 TARGET_NAME_LIST = ["comments", "users", "score_wilson", "controversiality_wilson"]
@@ -240,7 +240,7 @@ EXPERIMENT_CONSTRUCTION_TYPE["add_usergraph_features"] = True
 EXPERIMENT_CONSTRUCTION_TYPE["add_temporal_features"] = True
 
 DATA_FOLDER = "Rizos/Reddit_News"
-FEATURE_OSN_NAME_LIST = ["reddit"]  # If more than one, it is a JOINT experiment.
+FEATURE_OSN_NAME_LIST = ["reddit"]
 TARGET_OSN_NAME = "reddit"  # OSN targets.
 OSN_NAME_FOCUS = "reddit"  # OSN-based timestamps.
 TARGET_NAME_LIST = ["comments", "users", "score_wilson", "controversiality_wilson"]
