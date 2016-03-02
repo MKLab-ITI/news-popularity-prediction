@@ -9,12 +9,14 @@ from news_popularity_prediction.datautil.common import get_package_path
 from news_popularity_prediction.datautil.feature_rw import make_folders
 from news_popularity_prediction.discussion.builder import extract_features_static_dataset
 from news_popularity_prediction.learning.cascade_lifetime import calculate_comparison_lifetimes, make_feature_matrices
+from news_popularity_prediction.entry_points.snow_2016_workshop import experiment_configurations
 
 
 ########################################################################################################################
 # Configure feature extraction.
 ########################################################################################################################
-OUTPUT_DATA_FOLDER = "/path/to/output/data/folder"
+# OUTPUT_DATA_FOLDER = "/path/to/output/data/folder"
+OUTPUT_DATA_FOLDER = "/home/georgerizos/Documents/test"
 ########################################################################################################################
 
 ########################################################################################################################
@@ -33,8 +35,8 @@ if len(reddit_news_file_names) != 4:
     reddit_flag = False
 else:
     reddit_flag = True
-    make_folders(OUTPUT_DATA_FOLDER + "/reddit_news",
-                 dataset_name="reddit_news")
+    make_folders(OUTPUT_DATA_FOLDER + "/reddit",
+                 dataset_name="reddit")
 
 # Check for SlashDot.
 try:
@@ -63,7 +65,7 @@ else:
     barrapunto_flag = True
     make_folders(OUTPUT_DATA_FOLDER + "/barrapunto",
                  dataset_name="barrapunto")
-
+"""
 ########################################################################################################################
 # Extract features for online discussions.
 ########################################################################################################################
@@ -71,7 +73,7 @@ print("Extracting features for online discussions ...")
 
 # Extract features for RedditNews discussions.
 if reddit_flag:
-    dataset_name = "reddit_news"
+    dataset_name = "reddit"
     extract_features_static_dataset(dataset_name=dataset_name,
                                     input_data_folder=get_package_path() + "/news_post_data/" + dataset_name + "/anonymized_discussions",
                                     output_data_folder=OUTPUT_DATA_FOLDER + "/" + dataset_name + "/features")
@@ -98,7 +100,7 @@ print("Features extracted.")
 
 print("Calculating the comparison lifetimes ...")
 if reddit_flag:
-    dataset_name = "reddit_news"
+    dataset_name = "reddit"
     calculate_comparison_lifetimes(features_folder=OUTPUT_DATA_FOLDER + "/" + dataset_name + "/features",
                                    osn_focus=None)
 
@@ -118,7 +120,7 @@ print("Lifetimes calculated.")
 print("Forming and storing the feature matrices for the lifetimes ...")
 
 if reddit_flag:
-    dataset_name = "reddit_news"
+    dataset_name = "reddit"
     make_feature_matrices(features_folder=OUTPUT_DATA_FOLDER + "/" + dataset_name + "/features",
                           osn_focus="reddit")
 
@@ -133,15 +135,15 @@ if barrapunto_flag:
                           osn_focus="barrapunto")
 
 print("Feature matrices stored.")
-
+"""
 ########################################################################################################################
 # Perform experiments.
 ########################################################################################################################
 if reddit_flag:
-    from news_popularity_prediction.entry_points.snow_2016_workshop import reddit_news_entry
+    experiment_configurations.reddit_news_experiments(OUTPUT_DATA_FOLDER)
 
 if slashdot_flag:
-    from news_popularity_prediction.entry_points.snow_2016_workshop import slashdot_entry
+    experiment_configurations.slashdot_experiments(OUTPUT_DATA_FOLDER)
 
 if barrapunto_flag:
-    from news_popularity_prediction.entry_points.snow_2016_workshop import barrapunto_entry
+    experiment_configurations.barrapunto_experiments(OUTPUT_DATA_FOLDER)

@@ -15,9 +15,6 @@ from news_popularity_prediction.datautil.feature_rw import h5_open, h5_close, h5
 
 def random_ranking(y_train, X_test):
     pass
-    # y_pred = rand.randint(0, 2, size=X_test.shape[0])
-    #
-    # return y_pred
 
 
 def initialize_k_evaluation_measures(number_of_k,
@@ -79,17 +76,17 @@ def store_k_evaluation_measures(store_path,
                    "/data/p_value/fold" + str(fold_index),
                    data_frame)
 
-        data_frame = pd.DataFrame(k_evaluation_measures[6][:, fold_index], columns=["mse"], index=k_list)
+        data_frame = pd.DataFrame(k_evaluation_measures[2][:, fold_index], columns=["mse"], index=k_list)
         h5store_at(h5_store,
                    "/data/mse/fold" + str(fold_index),
                    data_frame)
 
-        data_frame = pd.DataFrame(k_evaluation_measures[7][:, fold_index], columns=["jaccard"], index=k_list)
+        data_frame = pd.DataFrame(k_evaluation_measures[3][:, fold_index], columns=["jaccard"], index=k_list)
         h5store_at(h5_store,
                    "/data/top_k_jaccard/fold" + str(fold_index),
                    data_frame)
 
-        data_frame = pd.DataFrame(k_evaluation_measures[8][:, fold_index, :], columns=feature_column_names, index=k_list)
+        data_frame = pd.DataFrame(k_evaluation_measures[4][:, fold_index, :], columns=feature_column_names, index=k_list)
         h5store_at(h5_store,
                    "/data/feature_importances/fold" + str(fold_index),
                    data_frame)
@@ -215,8 +212,7 @@ def learning_module(file_path,
                                                 X_test,
                                                 y_train,
                                                 y_test)
-        # print(X_test)
-        # print(np.max(X_test))
+
         y_pred = regressor_fitted.predict(X_test)
 
         test = train_test[1]
@@ -239,16 +235,10 @@ def learning_module(file_path,
         feature_importances = np.empty((1, 0))
 
     # Test.
-    # start_time = time.perf_counter()
     kendall_tau_score, p_value = kendalltau(y_test, y_pred)
-    # weighted_kendall_tau_score, weighted_p_value = kendalltau(y_test, y_pred)
-    # top_k_weighted_kendall_tau_score, top_k_weighted_p_value = kendalltau(y_test, y_pred)
 
     mse = np.mean(np.power(y_test - y_pred, 2))
     top_k_jaccard = top_k_jaccard_score(y_test, y_pred, top_k=100)
-
-    # elapsed_time = time.perf_counter() - start_time
-    # print("Kendall Tau time: ", elapsed_time)
 
     ranking_evaluation_tuple = [kendall_tau_score, p_value,
                                 mse, top_k_jaccard,
@@ -300,17 +290,12 @@ def get_regressor_fitted(file_path,
             print(file_path)
             raise e
     else:
-        # start_time = time.perf_counter()
         regressor = RandomForestRegressor(n_estimators=50,
                                           criterion="mse",
                                           max_features="auto",
                                           n_jobs=get_threads_number())
 
         regressor_fitted = regressor.fit(X_train, y_train)
-
-
-        # elapsed_time = time.perf_counter() - start_time
-        # print("Training: ", elapsed_time)
 
         store_sklearn_model(file_path, regressor_fitted)
     return regressor_fitted
@@ -325,25 +310,6 @@ def update_evaluation_measure_arrays(evaluation_measure_arrays,
     evaluation_measure_arrays[3][fold_index] = evaluation_tuple[3]
 
     evaluation_measure_arrays[4][fold_index, :] = evaluation_tuple[4]  # Feature weights
-
-
-# def average_evaluation_measure_arrays_across_trials(evaluation_measure_arrays):
-#     kendall_tau_score_mean = evaluation_measure_arrays[0].mean()
-#     kendall_tau_score_std = evaluation_measure_arrays[0].std()
-#
-#     p_value_mean = evaluation_measure_arrays[1].mean()
-#     p_value_std = evaluation_measure_arrays[1].std()
-#
-#     feature_importances_mean = evaluation_measure_arrays[4].mean(axis=0)
-#     feature_importances_std = evaluation_measure_arrays[4].std(axis=0)
-#
-#     evaluation_measures = [kendall_tau_score_mean, kendall_tau_score_std,
-#                            p_value_mean, p_value_std,
-#                            feature_importances_mean, feature_importances_std]
-#
-#     print("Average Kendall's tau score: ", kendall_tau_score_mean)
-#
-#     return evaluation_measures
 
 
 def is_k_valid(i,

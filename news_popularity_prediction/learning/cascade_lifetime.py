@@ -6,7 +6,8 @@ import statistics
 import numpy as np
 import pandas as pd
 
-from news_popularity_prediction.datautil.feature_rw import h5load_from, h5store_at, h5_open, h5_close, get_target_value
+from news_popularity_prediction.datautil.feature_rw import h5load_from, h5store_at, h5_open, h5_close, get_target_value,\
+    get_kth_row
 from news_popularity_prediction.discussion.features import get_branching_feature_names, get_usergraph_feature_names,\
     get_temporal_feature_names
 from news_popularity_prediction.learning import concatenate_features
@@ -197,8 +198,11 @@ def fill_X_handcrafted_full_and_y_raw(dataset_full,
             dataset_full[osn_name]["y_raw"][target_name][offset + d] = get_target_value(handcrafted_features_data_frame,
                                                                                         target_name)
 
-"""
-def load_dataset_full(dataset_full_path):
+
+def load_dataset_full(dataset_full_path,
+                      target_osn_name,
+                      feature_osn_name_list,
+                      target_name_list):
     dataset_full = dict()
     dataset_full[target_osn_name] = dict()
 
@@ -207,11 +211,11 @@ def load_dataset_full(dataset_full_path):
     h5_store = h5_open(dataset_full_path)
 
     for osn_name in feature_osn_name_list:
-        df = h5load_from(h5_store, "/data/" + osn_name + "/X_branching")[branching_feature_names_list_dict[osn_name]]
-        # index[osn_name] = df.index
+        df = h5load_from(h5_store, "/data/" + osn_name + "/X_branching")[sorted(list(get_branching_feature_names(osn_name)))]
+        index[osn_name] = list(df.index)
         dataset_full[osn_name]["X_branching"] = df.values
-        dataset_full[osn_name]["X_usergraph"] = h5load_from(h5_store, "/data/" + osn_name + "/X_usergraph")[usergraph_feature_names_list_dict[osn_name]].values
-        dataset_full[osn_name]["X_temporal"] = h5load_from(h5_store, "/data/" + osn_name + "/X_temporal")[temporal_feature_names_list_dict[osn_name]].values
+        dataset_full[osn_name]["X_usergraph"] = h5load_from(h5_store, "/data/" + osn_name + "/X_usergraph")[sorted(list(get_usergraph_feature_names(osn_name)))].values
+        dataset_full[osn_name]["X_temporal"] = h5load_from(h5_store, "/data/" + osn_name + "/X_temporal")[sorted(list(get_temporal_feature_names(osn_name)))].values
 
     data_frame = h5load_from(h5_store, "/data/" + target_osn_name + "/y_raw")
     dataset_full[target_osn_name]["y_raw"] = dict()
@@ -221,7 +225,7 @@ def load_dataset_full(dataset_full_path):
     h5_close(h5_store)
 
     return dataset_full, index
-"""
+
 
 def store_dataset_full(dataset_full_path,
                        dataset_full,
@@ -255,9 +259,9 @@ def store_dataset_full(dataset_full_path,
 
     h5_close(h5_store)
 
-"""
-def load_dataset_k(self,
-                   dataset_k_path):
+
+def load_dataset_k(dataset_k_path,
+                   feature_osn_name_list):
     dataset_k = dict()
     X_k_min_dict = dict()
     X_t_next_dict = dict()
@@ -266,15 +270,15 @@ def load_dataset_k(self,
 
     h5_store = h5_open(dataset_k_path)
 
-    for osn_name in self.feature_osn_name_list:
+    for osn_name in feature_osn_name_list:
         dataset_k[osn_name] = dict()
 
-        df = h5load_from(h5_store, "/data/" + osn_name + "/X_branching")[self.branching_feature_names_list_dict[osn_name]]
-        # index[osn_name] = df.index
+        df = h5load_from(h5_store, "/data/" + osn_name + "/X_branching")[sorted(list(get_branching_feature_names(osn_name)))]
+        index[osn_name] = list(df.index)
 
         dataset_k[osn_name]["X_branching"] = df.values
-        dataset_k[osn_name]["X_usergraph"] = h5load_from(h5_store, "/data/" + osn_name + "/X_usergraph")[self.usergraph_feature_names_list_dict[osn_name]].values
-        dataset_k[osn_name]["X_temporal"] = h5load_from(h5_store, "/data/" + osn_name + "/X_temporal")[self.temporal_feature_names_list_dict[osn_name]].values
+        dataset_k[osn_name]["X_usergraph"] = h5load_from(h5_store, "/data/" + osn_name + "/X_usergraph")[sorted(list(get_usergraph_feature_names(osn_name)))].values
+        dataset_k[osn_name]["X_temporal"] = h5load_from(h5_store, "/data/" + osn_name + "/X_temporal")[sorted(list(get_temporal_feature_names(osn_name)))].values
 
         data_frame = h5load_from(h5_store, "/data/" + osn_name + "/utility_arrays")
         X_k_min_dict[osn_name] = data_frame["X_k_min_array"].values
@@ -283,7 +287,7 @@ def load_dataset_k(self,
     h5_close(h5_store)
 
     return dataset_k, X_k_min_dict, X_t_next_dict, index
-"""
+
 
 def store_dataset_k(dataset_k_path,
                     dataset_k,
@@ -417,8 +421,8 @@ def calculate_comparison_lifetimes(features_folder,
     h5_stores_and_keys = get_h5_stores_and_keys(features_folder,
                                                 osn_focus)
 
-    t_list = get_valid_k_list(h5_stores_and_keys,
-                              osn_focus)
+    t_list = make_valid_k_list(h5_stores_and_keys,
+                               osn_focus)
 
     k_list_path = features_folder + "/k_list/focus_" + osn_focus + ".txt"
 
@@ -456,8 +460,8 @@ def get_h5_stores_and_keys(features_folder,
     return h5_stores_and_keys
 
 
-def get_valid_k_list(h5_stores_and_keys,
-                     osn_focus):
+def make_valid_k_list(h5_stores_and_keys,
+                      osn_focus):
     comment_lifetime_list = get_all_post_lifetimes(h5_stores_and_keys,
                                                    osn_focus)
 
@@ -591,17 +595,3 @@ def get_cascade_lifetime(data_frame):
 
     cascade_lifetime = last_comment_timestamp - cascade_source_timestamp
     return cascade_lifetime
-
-
-def get_kth_row(data_frame, k, feature_list):
-    row = data_frame[feature_list]
-    row = row.iloc[k]
-
-    return row
-
-
-def get_kth_col(data_frame, k, feature_list):
-    col = data_frame[feature_list]
-    col = col.iloc[:, k]
-
-    return col

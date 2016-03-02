@@ -157,7 +157,7 @@ def make_folders(top_folder, dataset_name):
     :return: None
     """
     safe_make_folder(top_folder + "/results")
-    safe_make_folder(top_folder + "/results/" + dataset_name + "_focus")
+    safe_make_folder(top_folder + "/results/" + dataset_name)
 
     safe_make_folder(top_folder + "/features")
     safe_make_folder(top_folder + "/features/dataset_full")
@@ -176,3 +176,17 @@ def safe_make_folder(folder):
     """
     if not os.path.exists(folder):
         os.makedirs(folder)
+
+
+def get_kth_row(data_frame, k, feature_list):
+    row = data_frame[feature_list]
+    row = row.iloc[k]
+
+    return row
+
+
+def get_kth_col(data_frame, k, feature_list):
+    col = data_frame[feature_list]
+    col = col.iloc[:, k]
+
+    return col

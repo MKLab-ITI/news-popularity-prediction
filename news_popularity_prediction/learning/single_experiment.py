@@ -7,8 +7,7 @@ import numpy as np
 from news_popularity_prediction.learning.ranking import initialize_k_evaluation_measures, update_k_evaluation_measures,\
     store_k_evaluation_measures, form_ground_truth, initialize_evaluation_measure_arrays, folding, learning_module,\
     update_evaluation_measure_arrays
-from news_popularity_prediction.learning.cascade_lifetime import load_valid_k_list, store_valid_k_list,\
-    get_valid_k_list, get_h5_stores_and_keys, load_dataset_k, load_dataset_full
+from news_popularity_prediction.learning.cascade_lifetime import load_valid_k_list, load_dataset_k, load_dataset_full
 from news_popularity_prediction.discussion.features import get_branching_feature_names, get_usergraph_feature_names,\
     get_temporal_feature_names
 from news_popularity_prediction.discussion.datasetwide import load_dataset_user_anonymizer
@@ -49,11 +48,10 @@ class DiscussionModellingExperiment:
         folder_paths_and_features = self.select_dataset(self.feature_osn_name_list,
                                                         self.target_osn_name)
         self.uniform_folder = folder_paths_and_features[0]
-        self.design_folder = folder_paths_and_features[1]
-        self.results_folder = folder_paths_and_features[2]
-        self.branching_feature_dict = folder_paths_and_features[3]
-        self.usergraph_feature_dict = folder_paths_and_features[4]
-        self.temporal_feature_dict = folder_paths_and_features[5]
+        self.results_folder = folder_paths_and_features[1]
+        self.branching_feature_dict = folder_paths_and_features[2]
+        self.usergraph_feature_dict = folder_paths_and_features[3]
+        self.temporal_feature_dict = folder_paths_and_features[4]
 
         self.branching_feature_names_list_dict = dict()
         self.usergraph_feature_names_list_dict = dict()
@@ -95,7 +93,7 @@ class DiscussionModellingExperiment:
 
         # Define feature matrix columns.
         feature_matrix_column_names_tuple = self.define_feature_matrix_column_names()
-        self.feature_matrix_column_names = feature_matrix_column_names_tuple[0]
+        self.feature_matrix_column_names = feature_matrix_column_names_tuple
         self.total_number_of_features = len(self.feature_matrix_column_names)
 
         if self.add_branching_features:
@@ -149,19 +147,13 @@ class DiscussionModellingExperiment:
 
     def get_valid_k_list_wrapper(self):
 
-        k_list_path = self.uniform_folder + "/k_list/focus_" + self.osn_name_focus + ".txt"
+        k_list_path = self.uniform_folder + "/k_list/focus_post" + ".txt"
 
         if os.path.exists(k_list_path):
             k_list = load_valid_k_list(k_list_path)
         else:
-            self.h5_stores_and_keys = get_h5_stores_and_keys(features_folder=self.uniform_folder,
-                                                             osn_focus=self.feature_osn_name_list)
-
-            k_list = get_valid_k_list(h5_stores_and_keys=self.h5_stores_and_keys,
-                                      osn_focus=self.osn_name_focus)
-
-            store_valid_k_list(k_list_path,
-                               k_list)
+            print("Comparison lifetimes not found.")
+            raise RuntimeError
 
         return self.h5_stores_and_keys, k_list
 
@@ -365,9 +357,8 @@ class DiscussionModellingExperiment:
         add_usergraph_features = self.add_usergraph_features
         add_temporal_features = self.add_temporal_features
 
-        uniform_folder = "/home/georgerizos/Documents/LocalStorage/memory/" + data_folder + "/uniform"
-        design_folder = "/home/georgerizos/Documents/LocalStorage/memory/" + data_folder + "/design"
-        results_folder = "/home/georgerizos/Documents/LocalStorage/memory/" + data_folder + "/results/" + self.osn_name_focus + "_focus"
+        uniform_folder = data_folder + "/features"
+        results_folder = data_folder + "/results/" + self.osn_name_focus
 
         branching_feature_dict = dict()
         usergraph_feature_dict = dict()
@@ -414,7 +405,6 @@ class DiscussionModellingExperiment:
                     usergraph_feature_dict[feature_osn_name].add("user_graph_user_count")
 
         return uniform_folder,\
-               design_folder,\
                results_folder,\
                branching_feature_dict,\
                usergraph_feature_dict,\
@@ -425,7 +415,10 @@ class DiscussionModellingExperiment:
 
         if os.path.exists(dataset_full_path):
             dataset_full,\
-            index = load_dataset_full(dataset_full_path)
+            index = load_dataset_full(dataset_full_path,
+                                      self.target_osn_name,
+                                      self.feature_osn_name_list,
+                                      self.target_name_list)
 
             dataset_size = dataset_full[self.feature_osn_name_list[0]]["X_branching"].shape[0]
         else:
@@ -446,7 +439,8 @@ class DiscussionModellingExperiment:
             dataset_k,\
             X_k_min_dict,\
             X_t_next_dict,\
-            index = load_dataset_k(dataset_k_path)
+            index = load_dataset_k(dataset_k_path,
+                                   self.feature_osn_name_list)
         else:
             print("Feature matrices not calculated.")
             raise RuntimeError
