@@ -418,7 +418,10 @@ class DiscussionModellingExperiment:
             index = load_dataset_full(dataset_full_path,
                                       self.target_osn_name,
                                       self.feature_osn_name_list,
-                                      self.target_name_list)
+                                      self.target_name_list,
+                                      self.branching_feature_names_list_dict,
+                                      self.usergraph_feature_names_list_dict,
+                                      self.temporal_feature_names_list_dict)
 
             dataset_size = dataset_full[self.feature_osn_name_list[0]]["X_branching"].shape[0]
         else:
@@ -440,7 +443,10 @@ class DiscussionModellingExperiment:
             X_k_min_dict,\
             X_t_next_dict,\
             index = load_dataset_k(dataset_k_path,
-                                   self.feature_osn_name_list)
+                                   self.feature_osn_name_list,
+                                   self.branching_feature_names_list_dict,
+                                   self.usergraph_feature_names_list_dict,
+                                   self.temporal_feature_names_list_dict)
         else:
             print("Feature matrices not calculated.")
             raise RuntimeError

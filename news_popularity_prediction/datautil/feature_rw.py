@@ -165,6 +165,7 @@ def make_folders(top_folder, dataset_name):
     safe_make_folder(top_folder + "/features/datasetwide")
     safe_make_folder(top_folder + "/features/k_list")
     safe_make_folder(top_folder + "/features/models")
+    safe_make_folder(top_folder + "/features/models/" + dataset_name)
 
 
 def safe_make_folder(folder):

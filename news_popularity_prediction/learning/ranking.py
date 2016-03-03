@@ -220,8 +220,6 @@ def learning_module(file_path,
         max_pred_index = np.argmax(y_pred)
         max_pred_index = test[max_pred_index]
 
-        print(max_pred_index, np.max(y_pred), np.min(y_pred))
-
         feature_importances = regressor_fitted.feature_importances_
     else:
         if baseline == "mean":
