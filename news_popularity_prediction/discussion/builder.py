@@ -7,8 +7,9 @@ import collections
 import numpy as np
 import scipy.sparse as spsp
 
-from news_popularity_prediction.discussion.anonymized import document_generator, comment_generator, extract_user_name,\
-    extract_comment_name, calculate_targets, extract_timestamp, extract_parent_comment_name
+# from news_popularity_prediction.discussion.anonymized import document_generator, comment_generator, extract_user_name,\
+#     extract_comment_name, calculate_targets, extract_timestamp, extract_parent_comment_name
+from news_popularity_prediction.discussion import anonymized, slashdot
 from news_popularity_prediction.discussion.features import get_handcrafted_feature_names, initialize_timestamp_array,\
     initialize_handcrafted_features, initialize_intermediate, update_timestamp_array, update_intermediate,\
     update_handcrafted_features
@@ -30,6 +31,25 @@ def store_file_counter_generator(thread_id, number_of_threads):
 def extract_features_static_dataset(dataset_name,
                                     input_data_folder,
                                     output_data_folder):
+    if dataset_name == "reddit":
+        document_generator = anonymized.document_generator
+        comment_generator = anonymized.comment_generator
+        extract_user_name = anonymized.extract_user_name
+        extract_comment_name = anonymized.extract_comment_name
+        calculate_targets = anonymized.calculate_targets
+        extract_timestamp = anonymized.extract_timestamp
+        extract_parent_comment_name = anonymized.extract_parent_comment_name
+    elif dataset_name in ["slashdot", "barrapunto"]:
+        document_generator = slashdot.document_generator
+        comment_generator = slashdot.comment_generator
+        extract_user_name = slashdot.extract_user_name
+        extract_comment_name = slashdot.extract_comment_name
+        calculate_targets = slashdot.calculate_targets
+        extract_timestamp = slashdot.extract_timestamp
+        extract_parent_comment_name = slashdot.extract_parent_comment_name
+    else:
+        print("Invalid dataset name.")
+        raise RuntimeError
 
     ####################################################################################################################
     # Dataset-wide user anonymization.
