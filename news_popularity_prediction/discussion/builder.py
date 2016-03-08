@@ -7,8 +7,6 @@ import collections
 import numpy as np
 import scipy.sparse as spsp
 
-# from news_popularity_prediction.discussion.anonymized import document_generator, comment_generator, extract_user_name,\
-#     extract_comment_name, calculate_targets, extract_timestamp, extract_parent_comment_name
 from news_popularity_prediction.discussion import anonymized, slashdot
 from news_popularity_prediction.discussion.features import get_handcrafted_feature_names, initialize_timestamp_array,\
     initialize_handcrafted_features, initialize_intermediate, update_timestamp_array, update_intermediate,\
