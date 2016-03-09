@@ -11,8 +11,8 @@ def document_generator(source_file_path_list):
             file_line_list = f.readlines()
             file_string = "".join(file_line_list)
             file_string = file_string.replace("&", "")
-        document = etree.parse(StringIO(file_string))
-        yield document
+            document = etree.parse(StringIO(file_string))
+            yield document
 
 
 def comment_generator(document):

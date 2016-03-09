@@ -191,7 +191,7 @@ def extract_features_static_dataset(dataset_name,
 
         while True:
             try:
-                comment = next(comment_gen)
+                comment = next(safe_comment_gen)
             except TypeError:
                 invalid_tree = True
                 break
