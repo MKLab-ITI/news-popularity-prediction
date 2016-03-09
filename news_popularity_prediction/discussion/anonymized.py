@@ -38,6 +38,12 @@ def comment_generator(document):
         yield comment
 
 
+def extract_document_post_name(document):
+    document_post_name = document["post_id"]
+
+    return document_post_name
+
+
 def extract_timestamp(comment):
     timestamp = comment["timestamp"]
 

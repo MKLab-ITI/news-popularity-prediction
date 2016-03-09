@@ -1,11 +1,17 @@
 __author__ = 'Georgios Rizos (georgerizos@iti.gr)'
 
+from io import StringIO
 import xml.etree.cElementTree as etree
 
 
 def document_generator(source_file_path_list):
     for file_path in source_file_path_list:
-        document = etree.ElementTree(file=file_path)
+        with open(file_path, "r", encoding="iso-8859-1") as f:
+            # Remove .html entities.
+            file_line_list = f.readlines()
+            file_string = "".join(file_line_list)
+            file_string = file_string.replace("&", "")
+        document = etree.parse(StringIO(file_string))
         yield document
 
 
@@ -17,6 +23,12 @@ def comment_generator(document):
     comments = root.findall("./comments/comment")
     for comment in comments:
         yield comment
+
+
+def extract_document_post_name(document):
+    document_post_name = document.find(".id").text
+
+    return document_post_name
 
 
 def extract_comment_name(comment):
@@ -44,8 +56,7 @@ def extract_user_name(comment):
 def calculate_targets(document,
                       comment_name_set,
                       user_name_set,
-                      within_discussion_anonymous_coward,
-                      discussion_unobserved_reply_count=0):
+                      within_discussion_anonymous_coward):
     target_dict = dict()
 
     target_dict["comments"] = len(comment_name_set) - 1

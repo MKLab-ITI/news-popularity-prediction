@@ -63,6 +63,7 @@ def h5load_from(store, name):
 def store_features(timestamp_h5_store_file,
                    handcrafted_features_h5_store_file,
                    document,
+                   document_post_name,
                    target_dict,
                    comment_counter,
                    timestamp_array,
@@ -75,6 +76,7 @@ def store_features(timestamp_h5_store_file,
     :param timestamp_h5_store_file: Contains data frames of the raw and preprocessed comment timestamps.
     :param handcrafted_features_h5_store_file: Contains data frames of the engineered features for the discussions.
     :param document: A dictionary containing the documents discussion-related fields (initial_post, comments etc).
+    :param document_post_name:
     :param target_dict: A dictionary containing the prediction target values.
     :param comment_counter: This is the number of comments that were found when preprocessing the data.
     :param timestamp_array: The numpy array containing timestamps to be stored as a data frame in an h5 store file.
@@ -104,10 +106,10 @@ def store_features(timestamp_h5_store_file,
 
     # Store data frame along with metadata.
     h5store_at(timestamp_h5_store_file,
-               "/data/post_" + document["post_id"],
+               "/data/post_" + document_post_name,
                timestamp_data_frame)
     h5store_at(handcrafted_features_h5_store_file,
-               "/data/post_" + document["post_id"],
+               "/data/post_" + document_post_name,
                handcrafted_features_data_frame)
 
 

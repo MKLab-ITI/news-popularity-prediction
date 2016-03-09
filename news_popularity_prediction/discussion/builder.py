@@ -32,19 +32,28 @@ def extract_features_static_dataset(dataset_name,
     if dataset_name == "reddit":
         document_generator = anonymized.document_generator
         comment_generator = anonymized.comment_generator
+        extract_document_post_name = anonymized.extract_document_post_name
         extract_user_name = anonymized.extract_user_name
         extract_comment_name = anonymized.extract_comment_name
         calculate_targets = anonymized.calculate_targets
         extract_timestamp = anonymized.extract_timestamp
         extract_parent_comment_name = anonymized.extract_parent_comment_name
+
+        anonymous_coward_name = None
     elif dataset_name in ["slashdot", "barrapunto"]:
         document_generator = slashdot.document_generator
         comment_generator = slashdot.comment_generator
+        extract_document_post_name = slashdot.extract_document_post_name
         extract_user_name = slashdot.extract_user_name
         extract_comment_name = slashdot.extract_comment_name
         calculate_targets = slashdot.calculate_targets
         extract_timestamp = slashdot.extract_timestamp
         extract_parent_comment_name = slashdot.extract_parent_comment_name
+
+        if dataset_name == "slashdot":
+            anonymous_coward_name = "Anonymous Coward"
+        elif dataset_name == "barrapunto":
+            anonymous_coward_name = "pobrecito hablador"  # "Pendejo Sin Nombre"
     else:
         print("Invalid dataset name.")
         raise RuntimeError
@@ -88,6 +97,8 @@ def extract_features_static_dataset(dataset_name,
         if actual_document_counter % 500 == 0:
             print("Document no: ", actual_document_counter)
 
+        invalid_tree = False
+
         comment_gen = comment_generator(document=document)
 
         ################################################################################################################
@@ -99,26 +110,34 @@ def extract_features_static_dataset(dataset_name,
         within_discussion_user_anonymize,\
         within_discussion_anonymous_coward = within_discussion_comment_and_user_anonymization(comment_gen=comment_gen,
                                                                                               extract_comment_name=extract_comment_name,
-                                                                                              extract_user_name=extract_user_name)
+                                                                                              extract_user_name=extract_user_name,
+                                                                                              anonymous_coward_name=anonymous_coward_name)
 
         ################################################################################################################
         # Calculate prediction targets.
         ################################################################################################################
         try:
-            target_dict = calculate_targets(document)
+            target_dict = calculate_targets(document,
+                                            comment_name_set,
+                                            user_name_set,
+                                            within_discussion_anonymous_coward)
         except KeyError as e:
             continue
 
         ################################################################################################################
         # Initiate a smart/safe iteration over all comments.
         ################################################################################################################
-        safe_comment_gen = safe_comment_generator(document=document,
-                                                  comment_generator=comment_generator,
-                                                  within_discussion_comment_anonymize=within_discussion_comment_anonymize,
-                                                  extract_comment_name=extract_comment_name,
-                                                  extract_parent_comment_name=extract_parent_comment_name,
-                                                  extract_timestamp=extract_timestamp,
-                                                  safe=True)
+        try:
+            safe_comment_gen = safe_comment_generator(document=document,
+                                                      comment_generator=comment_generator,
+                                                      within_discussion_comment_anonymize=within_discussion_comment_anonymize,
+                                                      extract_comment_name=extract_comment_name,
+                                                      extract_parent_comment_name=extract_parent_comment_name,
+                                                      extract_timestamp=extract_timestamp,
+                                                      safe=True)
+        except TypeError:
+            invalid_tree = True
+            continue
 
         ################################################################################################################
         # Initialize features and intermediate information and structures for incrementally calculating features.
@@ -126,8 +145,16 @@ def extract_features_static_dataset(dataset_name,
         # Just get the set.
         handcrafted_feature_names_set = get_handcrafted_feature_names(dataset_name)
 
-        initial_post = next(safe_comment_gen)
-        timestamp = extract_timestamp(initial_post)
+        try:
+            initial_post = next(safe_comment_gen)
+        except TypeError:
+            invalid_tree = True
+            continue
+        try:
+            timestamp = extract_timestamp(initial_post)
+        except TypeError:
+            invalid_tree = True
+            continue
         op_raw_id = extract_user_name(initial_post)
         op_id = within_discussion_user_anonymize[op_raw_id]
         if op_id == within_discussion_anonymous_coward:
@@ -162,8 +189,14 @@ def extract_features_static_dataset(dataset_name,
                                       len(user_name_set)),
                                      dtype=np.int32)
 
-        invalid_tree = False
-        for comment in safe_comment_gen:
+        while True:
+            try:
+                comment = next(comment_gen)
+            except TypeError:
+                invalid_tree = True
+                break
+            except StopIteration:
+                break
             if comment is None:
                 invalid_tree = True
                 break
@@ -206,7 +239,11 @@ def extract_features_static_dataset(dataset_name,
             ############################################################################################################
             # Update intermediate information and structures for incrementally calculating features.
             ############################################################################################################
-            timestamp = extract_timestamp(comment)
+            try:
+                timestamp = extract_timestamp(comment)
+            except TypeError:
+                invalid_tree = True
+                break
             update_timestamp_array(timestamp_column_names_list,
                                    timestamp_array,
                                    timestamp,
@@ -262,6 +299,7 @@ def extract_features_static_dataset(dataset_name,
             store_features(timestamp_h5_store_file,
                            handcrafted_features_h5_store_file,
                            document,
+                           extract_document_post_name(document),
                            target_dict,
                            comment_counter,
                            timestamp_array,
@@ -364,7 +402,8 @@ def safe_comment_generator(document,
 
 def within_discussion_comment_and_user_anonymization(comment_gen,
                                                      extract_comment_name,
-                                                     extract_user_name):
+                                                     extract_user_name,
+                                                     anonymous_coward_name):
     """
     Reads all distinct users and comments in a single document and anonymizes them. Roots are 0.
     """
@@ -417,7 +456,7 @@ def within_discussion_comment_and_user_anonymization(comment_gen,
     user_name_set.add(op_name)
 
     try:
-        within_discussion_anonymous_coward = within_discussion_user_anonymize[None]
+        within_discussion_anonymous_coward = within_discussion_user_anonymize[anonymous_coward_name]
     except KeyError as e:
         within_discussion_anonymous_coward = None
 
