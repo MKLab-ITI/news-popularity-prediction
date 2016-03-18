@@ -15,8 +15,8 @@ from news_popularity_prediction.entry_points.snow_2016_workshop import experimen
 ########################################################################################################################
 # Configure feature extraction.
 ########################################################################################################################
-# OUTPUT_DATA_FOLDER = "/path/to/output/data/folder"
-OUTPUT_DATA_FOLDER = "/home/georgerizos/Documents/test"
+INPUT_DATA_FOLDER = "/path/to/input/data/folder"
+OUTPUT_DATA_FOLDER = "/path/to/output/data/folder"
 ########################################################################################################################
 
 ########################################################################################################################
@@ -26,11 +26,11 @@ print("Checking whether anonymized discussions exist.")
 
 # Check for RedditNews.
 try:
-    reddit_news_file_names = os.listdir(get_package_path() + "/news_post_data/reddit_news/anonymized_discussions")
+    reddit_news_file_names = os.listdir(INPUT_DATA_FOLDER + "/news_post_data/reddit_news/anonymized_discussions")
 except FileNotFoundError as e:
     reddit_news_file_names = list()
 
-if len(reddit_news_file_names) != 4:
+if len(reddit_news_file_names) != 3:
     print("RedditNews anonymized discussions not found.")
     reddit_flag = False
 else:
@@ -40,11 +40,11 @@ else:
 
 # Check for SlashDot.
 try:
-    slashdot_file_names = os.listdir(get_package_path() + "/news_post_data/slashdot/anonymized_discussions")
+    slashdot_file_names = os.listdir(INPUT_DATA_FOLDER + "/news_post_data/slashdot/anonymized_discussions")
 except FileNotFoundError as e:
     slashdot_file_names = list()
 
-if len(slashdot_file_names) != 4:
+if len(slashdot_file_names) != 10019:
     print("SlashDot anonymized discussions not found.")
     slashdot_flag = False
 else:
@@ -54,18 +54,18 @@ else:
 
 # Check for BarraPunto.
 try:
-    barrapunto_file_names = os.listdir(get_package_path() + "/news_post_data/barrapunto/anonymized_discussions")
+    barrapunto_file_names = os.listdir(INPUT_DATA_FOLDER + "/news_post_data/barrapunto/anonymized_discussions")
 except FileNotFoundError as e:
     barrapunto_file_names = list()
 
-if len(barrapunto_file_names) != 4:
+if len(barrapunto_file_names) != 7724:
     print("BarraPunto anonymized discussions not found.")
     barrapunto_flag = False
 else:
     barrapunto_flag = True
     make_folders(OUTPUT_DATA_FOLDER + "/barrapunto",
                  dataset_name="barrapunto")
-"""
+
 ########################################################################################################################
 # Extract features for online discussions.
 ########################################################################################################################
@@ -75,21 +75,21 @@ print("Extracting features for online discussions ...")
 if reddit_flag:
     dataset_name = "reddit"
     extract_features_static_dataset(dataset_name=dataset_name,
-                                    input_data_folder=get_package_path() + "/news_post_data/" + dataset_name + "/anonymized_discussions",
+                                    input_data_folder=INPUT_DATA_FOLDER + "/news_post_data/" + dataset_name + "/anonymized_discussions",
                                     output_data_folder=OUTPUT_DATA_FOLDER + "/" + dataset_name + "/features")
 
 # Extract features for SlashDot discussions.
 if slashdot_flag:
     dataset_name = "slashdot"
     extract_features_static_dataset(dataset_name=dataset_name,
-                                    input_data_folder=get_package_path() + "/news_post_data/" + dataset_name + "/anonymized_discussions",
+                                    input_data_folder=INPUT_DATA_FOLDER + "/news_post_data/" + dataset_name + "/anonymized_discussions",
                                     output_data_folder=OUTPUT_DATA_FOLDER + "/" + dataset_name + "/features")
 
 # Extract features for BarraPunto discussions.
 if barrapunto_flag:
     dataset_name = "barrapunto"
     extract_features_static_dataset(dataset_name=dataset_name,
-                                    input_data_folder=get_package_path() + "/news_post_data/" + dataset_name + "/anonymized_discussions",
+                                    input_data_folder=INPUT_DATA_FOLDER + "/news_post_data/" + dataset_name + "/anonymized_discussions",
                                     output_data_folder=OUTPUT_DATA_FOLDER + "/" + dataset_name + "/features")
 
 print("Features extracted.")
@@ -135,7 +135,7 @@ if barrapunto_flag:
                           osn_focus="barrapunto")
 
 print("Feature matrices stored.")
-"""
+
 ########################################################################################################################
 # Perform experiments.
 ########################################################################################################################
