@@ -9,7 +9,7 @@ def readme():
 
 setup(
     name='news-popularity-prediction',
-    version='0.1.1',
+    version='0.1.2',
     author='Georgios Rizos',
     author_email='georgerizos@iti.gr',
     packages=['news_popularity_prediction',
@@ -39,8 +39,5 @@ setup(
         'Topic :: Scientific/Engineering :: Information Analysis'
     ],
     keywords="news-popularity-prediction online-discussion-analysis Reveal-FP7",
-    # entry_points={
-    #     'console_scripts': ['run_all_experiments=news_popularity_prediction.entry_points.snow_2016_workshop.run_all_experiments:main'],
-    # },
     install_requires=open("requirements.txt").read().split("\n")
 )
