@@ -100,6 +100,12 @@ def get_post_url(document):
     return post_url
 
 
+def get_post_title(document):
+    post_title = document["initial_post"]["title"]
+
+    return post_title
+
+
 def extract_comment_name(comment):
     comment_name = comment["name"]
 
@@ -132,24 +138,27 @@ def calculate_targets(document,
     else:
         target_dict["users"] = len(user_name_set)
 
-    target_dict["number_of_upvotes"] = int(document["initial_post"]["ups"])
+    number_of_upvotes = int(document["initial_post"]["ups"])
     if float(document["initial_post"]["upvote_ratio"]) == 0.0:
-        target_dict["number_of_downvotes"] = abs(float(document["initial_post"]["ups"]) - float(document["initial_post"]["score"]))
+        number_of_downvotes = abs(float(document["initial_post"]["ups"]) - float(document["initial_post"]["score"]))
     else:
-        target_dict["number_of_downvotes"] = float(document["initial_post"]["ups"])*((1/float(document["initial_post"]["upvote_ratio"])) - 1)
-    target_dict["total_number_of_votes"] = target_dict["number_of_upvotes"] + target_dict["number_of_downvotes"]
+        number_of_downvotes = float(document["initial_post"]["ups"])*((1/float(document["initial_post"]["upvote_ratio"])) - 1)
+    total_number_of_votes = number_of_upvotes + number_of_downvotes
 
-    target_dict["score"] = target_dict["number_of_upvotes"] - target_dict["number_of_downvotes"]
+    if total_number_of_votes == 0:
+        target_dict["score_wilson"] = 0
 
-    if target_dict["total_number_of_votes"] == 0:
         target_dict["controversiality_wilson"] = 0
     else:
-        if np.floor(target_dict["total_number_of_votes"]/2) == 0.0:
+        target_dict["score_wilson"] = ci_lower_bound(number_of_upvotes,
+                                                     total_number_of_votes,
+                                                     0.95)
+        if np.floor(total_number_of_votes/2) == 0.0:
             target_dict["controversiality_wilson"] = 0
         else:
-            target_dict["controversiality_wilson"] = ci_lower_bound(min(np.floor(target_dict["number_of_upvotes"]),
-                                                                        np.floor(target_dict["number_of_downvotes"])),
-                                                                    np.floor(target_dict["total_number_of_votes"]/2),
+            target_dict["controversiality_wilson"] = ci_lower_bound(min(np.floor(number_of_upvotes),
+                                                                        np.floor(number_of_downvotes)),
+                                                                    np.floor(total_number_of_votes/2),
                                                                     0.95)
 
     return target_dict

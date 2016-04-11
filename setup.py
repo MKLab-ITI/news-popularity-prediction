@@ -18,7 +18,7 @@ setup(
               'news_popularity_prediction.entry_points.snow_2016_workshop',
               'news_popularity_prediction.features',
               'news_popularity_prediction.learning',
-              'news_popularity_prediction.vizualization'],
+              'news_popularity_prediction.visualization'],
     url='https://github.com/MKLab-ITI/news-popularity-prediction',
     license='Apache',
     description='A set of methods that predict the future values of popularity indices for news posts using a variety of features.',
