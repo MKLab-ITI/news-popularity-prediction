@@ -1,11 +1,11 @@
 # news-popularity-prediction
 A set of methods that predict the future values of popularity indices for news posts using a variety of features.
 
-This is supplementary code to the SNOW/WWW'16 workshop paper "Predicting News Popularity by Mining Online Discussions"
+This is supplementary code to the SNOW/WWW'16 workshop paper ["Predicting News Popularity by Mining Online Discussions"](http://dl.acm.org/citation.cfm?doid=2872518.2890096)
+
+The presentation slides from SNOW/WWW'16 can be found [here](http://www.slideshare.net/sympapadopoulos/predicting-news-popularity-by-mining-online-discussions).
 
 This study is also described in a non-technical way in this [blog post](http://www.snow-workshop.org/2016/predicting-news-popularity-by-mining-online-discussions/).
-
-(link to paper to be added)
 
 Install
 -------
