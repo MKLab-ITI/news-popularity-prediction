@@ -30,13 +30,13 @@ try:
 except FileNotFoundError as e:
     reddit_news_file_names = list()
 
-if len(reddit_news_file_names) != 3:
+if len(reddit_news_file_names) != 4:
     print("RedditNews anonymized discussions not found.")
     reddit_flag = False
 else:
     reddit_flag = True
-    make_folders(OUTPUT_DATA_FOLDER + "/reddit",
-                 dataset_name="reddit")
+    make_folders(OUTPUT_DATA_FOLDER + "/reddit_news",
+                 dataset_name="reddit_news")
 
 # Check for SlashDot.
 try:
@@ -44,7 +44,7 @@ try:
 except FileNotFoundError as e:
     slashdot_file_names = list()
 
-if len(slashdot_file_names) != 10019:
+if len(slashdot_file_names) != 10:
     print("SlashDot anonymized discussions not found.")
     slashdot_flag = False
 else:
@@ -58,7 +58,7 @@ try:
 except FileNotFoundError as e:
     barrapunto_file_names = list()
 
-if len(barrapunto_file_names) != 7724:
+if len(barrapunto_file_names) != 8:
     print("BarraPunto anonymized discussions not found.")
     barrapunto_flag = False
 else:
@@ -73,7 +73,7 @@ print("Extracting features for online discussions ...")
 
 # Extract features for RedditNews discussions.
 if reddit_flag:
-    dataset_name = "reddit"
+    dataset_name = "reddit_news"
     extract_features_static_dataset(dataset_name=dataset_name,
                                     input_data_folder=INPUT_DATA_FOLDER + "/news_post_data/" + dataset_name + "/anonymized_discussions",
                                     output_data_folder=OUTPUT_DATA_FOLDER + "/" + dataset_name + "/features")
@@ -100,7 +100,7 @@ print("Features extracted.")
 
 print("Calculating the comparison lifetimes ...")
 if reddit_flag:
-    dataset_name = "reddit"
+    dataset_name = "reddit_news"
     calculate_comparison_lifetimes(features_folder=OUTPUT_DATA_FOLDER + "/" + dataset_name + "/features",
                                    osn_focus=None)
 
@@ -120,7 +120,7 @@ print("Lifetimes calculated.")
 print("Forming and storing the feature matrices for the lifetimes ...")
 
 if reddit_flag:
-    dataset_name = "reddit"
+    dataset_name = "reddit_news"
     make_feature_matrices(features_folder=OUTPUT_DATA_FOLDER + "/" + dataset_name + "/features",
                           osn_focus="reddit")
 

@@ -19,7 +19,7 @@ def document_generator(source_file_path_list):
 
                 document["initial_post"] = document_json["uniform_json"]["initial_post"]
                 document["post_id"] = str(document_counter)
-                document["fetch_timestamp"] = document_json["fetch_timestamp"]
+                # document["fetch_timestamp"] = document_json["fetch_timestamp"]
                 document["comments"] = document_json["uniform_json"]["comments"]
 
                 document_counter += 1
