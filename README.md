@@ -32,7 +32,7 @@ Three datasets were used in the context of the paper:
 We collected the RedditNews dataset for the context of this paper and as such details on the collection can be found there. Please cite the paper if you intend to use it in your own studies. An anonymized version can be found on the GitHub project page, at news-popularity-prediction.news_popularity_prediction.news_post_data.reddit_news.anonymized_discussions
 .
 
-The SlashDot and BarraPunto datasets were made available to us by Drs. Vicenc Gomez and Andreas Kaltenbrunner. We include the code to preprocess them as required for this paper's experiments, although the datasets themselves are not included. Please cite this [paper](http://link.springer.com/article/10.1007/s11280-012-0162-8) if you intend to use them in your own studies.
+The SlashDot and BarraPunto datasets were made available to us by Drs. Vicenc Gomez and Andreas Kaltenbrunner. We include anonymized versions of these datasets as per their permission. Please cite this [paper](http://link.springer.com/article/10.1007/s11280-012-0162-8) if you intend to use them in your own studies.
 
 ### Run experiments
 
