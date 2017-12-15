@@ -5,7 +5,7 @@ This is supplementary code to the SNOW/WWW'16 workshop paper ["Predicting News P
 
 The presentation slides from SNOW/WWW'16 can be found [here](http://www.slideshare.net/sympapadopoulos/predicting-news-popularity-by-mining-online-discussions).
 
-This study is also described in a non-technical way in this [blog post](http://www.snow-workshop.org/2016/predicting-news-popularity-by-mining-online-discussions/).
+This study is also described in a non-technical way in this [blog post](https://revealproject.eu/predicting-news-popularity-by-mining-online-discussions/).
 
 Install
 -------
